@@ -1,113 +1,310 @@
+/* Modern CSS Reset and Variables */
+:root {
+    --primary: #4F46E5;
+    --primary-hover: #4338CA;
+    --secondary: #6B7280;
+    --success: #10B981;
+    --danger: #EF4444;
+    --background: #F9FAFB;
+    --card: #FFFFFF;
+    --text: #1F2937;
+    --text-light: #6B7280;
+    --border: #E5E7EB;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --radius: 0.75rem;
+}
+
 /* General Page Styling */
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-    text-align: center;
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 2rem 1rem;
 }
 
 /* Container */
 .container {
-    max-width: 900px;
-    margin: 30px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 1000px;
+    margin: 0 auto;
+    background: var(--card);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
 }
 
-/* Headings */
+/* Typography */
 h1 {
-    color: #007bff;
-    font-size: 28px;
+    color: var(--text);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: -0.025em;
+}
+
+h2 {
+    color: var(--text);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
 }
 
 /* Forms */
 form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-input, textarea, select {
+input, textarea {
     width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 16px;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    border: 2px solid var(--border);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: var(--background);
 }
 
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+/* Buttons */
 button {
-    background-color: #007bff;
+    background-color: var(--primary);
     color: white;
     border: none;
-    padding: 12px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: var(--radius);
     cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
-    transition: background 0.3s;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
-/* CV Preview */
-.cv-preview {
-    text-align: left;
-    background: #f1f1f1;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20px;
+button:active {
+    transform: translateY(0);
 }
 
-.cv-preview h2 {
-    color: #007bff;
-}
-
-/* Results Section */
+/* Results Sections */
 .results {
-    display: none; /* Hidden by default */
-    margin-top: 20px;
-    padding: 15px;
-    background: #f1f1f1;
-    border-radius: 5px;
+    display: none;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--background);
+    border-radius: var(--radius);
+    border: 2px solid var(--border);
+    animation: fadeIn 0.3s ease;
 }
 
 #optimized-cv-section {
-    display: none; /* Hidden by default */
-    margin-top: 20px;
-    padding: 15px;
-    background: #f1f1f1;
-    border-radius: 5px;
+    display: none;
+    margin-top: 2rem;
+    animation: fadeIn 0.3s ease;
 }
 
-/* Styling for AI-generated text areas */
+/* AI Analysis Section */
 #optimized-cv-editor, #ai-analysis {
     width: 100%;
-    padding: 15px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    font-family: 'Courier New', Courier, monospace; /* Monospace font for better readability */
-    background-color: #fff;
-    line-height: 1.6; /* Improve line spacing */
-    white-space: pre-wrap; /* Preserve formatting and line breaks */
-    overflow-y: auto; /* Add scrollbar if content overflows */
-    max-height: 400px; /* Limit height to prevent excessive scrolling */
-}
-
-/* Improve readability for AI-generated content */
-#ai-analysis h3 {
-    color: #007bff;
-    margin-bottom: 10px;
-}
-
-#ai-analysis p {
-    margin: 0;
-    padding: 0;
-    font-size: 16px;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    border: 2px solid var(--border);
+    font-family: 'Fira Code', 'Courier New', monospace;
+    background-color: var(--card);
     line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    max-height: 500px;
+    margin-bottom: 1rem;
+}
+
+#ai-analysis h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* File Input Styling */
+input[type="file"] {
+    padding: 0.5rem;
+    background: transparent;
+}
+
+input[type="file"]::file-selector-button {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    margin-right: 1rem;
+    transition: all 0.2s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: var(--primary-hover);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+
+/* Score Display */
+#ats-score {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--success);
+}
+
+/* Clear Data Button */
+button[onclick="clearSession()"] {
+    background-color: var(--danger);
+    margin-top: 2rem;
+}
+
+button[onclick="clearSession()"]:hover {
+    background-color: #DC2626;
+}
+
+/* Form Groups */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--text);
+}
+
+/* Score Container */
+.score-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--success);
+    margin: 1rem 0;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+
+/* Result Sections */
+.result-section {
+    margin-bottom: 2rem;
+}
+
+.result-section h3 {
+    color: var(--text);
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+.content-box {
+    background: var(--background);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Icons */
+.icon {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header p {
+    max-width: 600px;
+    margin: 1rem auto;
+}
+
+/* Clear Button */
+.clear-button {
+    opacity: 0.8;
+}
+
+.clear-button:hover {
+    opacity: 1;
 }

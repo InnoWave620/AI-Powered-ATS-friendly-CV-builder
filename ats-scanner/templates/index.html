@@ -5,44 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATS Resume Scanner & AI CV Builder</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap">
 </head>
 <body>
     <div class="container">
-        <h1>🛠️ ATS Resume Scanner & AI CV Enhancer</h1>
-        <p>Upload your resume and paste a job description to check your ATS compatibility or build an AI-enhanced CV.</p>
+        <header>
+            <h1>
+                <span class="icon">🎯</span>
+                ATS Resume Scanner & AI CV Enhancer
+            </h1>
+            <p>Upload your resume and paste a job description to check your ATS compatibility score and get AI-powered suggestions to enhance your CV.</p>
+        </header>
 
         <!-- Resume Scan Form -->
         <form method="POST" enctype="multipart/form-data" autocomplete="off" id="resumeForm">
-            <textarea name="job_description" id="job-description" placeholder="Paste Job Description Here" required>{{ job_description or '' }}</textarea>
-            <input type="file" name="resume" id="resume-file" accept=".pdf,.docx">
-            <button type="submit">🖨 Scan Resume</button>
+            <div class="form-group">
+                <label for="job-description">Job Description</label>
+                <textarea 
+                    name="job_description" 
+                    id="job-description" 
+                    placeholder="Paste the job description here..." 
+                    required>{{ job_description or '' }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="resume-file">Upload Resume (PDF or DOCX)</label>
+                <input 
+                    type="file" 
+                    name="resume" 
+                    id="resume-file" 
+                    accept=".pdf,.docx"
+                    required>
+            </div>
+
+            <button type="submit">
+                <span class="icon">📄</span>
+                Scan Resume
+            </button>
         </form>
 
         <!-- AI ATS Score & Analysis -->
         <div class="results" id="results-section" {% if score is not none %}style="display: block;"{% endif %}>
-            <h2>✅ AI-Generated ATS Score: <span id="ats-score">{{ score if score else 'N/A' }}</span>%</h2>
-            <button type="button" onclick="analyzeATS()">🤖 AI Analyze Score</button>
-            <button type="button" onclick="optimizeCV()">✨ AI Optimize CV</button>
+            <div class="score-container">
+                <h2>AI-Generated ATS Score</h2>
+                <div class="score">
+                    <span id="ats-score">{{ score if score else 'N/A' }}</span>%
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button type="button" onclick="analyzeATS()">
+                    <span class="icon">🤖</span>
+                    AI Analysis
+                </button>
+                <button type="button" onclick="optimizeCV()">
+                    <span class="icon">✨</span>
+                    Optimize CV
+                </button>
+            </div>
+            
             <div id="ai-analysis"></div>
         </div>
 
         <!-- Resume Scan Results -->
         <div class="results" id="resume-results" {% if resume_text is not none %}style="display: block;"{% endif %}>
-            <h2>✅ Resume Successfully Scanned</h2>
-            <p><strong>Job Description:</strong> <span id="job-desc">{{ job_description if job_description else '' }}</span></p>
-            <p><strong>Extracted Resume Text:</strong> 
-                <span id="resume-text">{{ resume_text[:500] if resume_text else 'No resume scanned yet' }}...</span>
-            </p>
+            <h2>Resume Scan Results</h2>
+            
+            <div class="result-section">
+                <h3>Job Description</h3>
+                <div class="content-box">
+                    <p id="job-desc">{{ job_description if job_description else '' }}</p>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <h3>Extracted Resume Text</h3>
+                <div class="content-box">
+                    <p id="resume-text">
+                        {{ resume_text[:500] if resume_text else 'No resume scanned yet' }}...
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- Optimized CV Section -->
         <div id="optimized-cv-section" {% if ai_suggestions is not none %}style="display: block;"{% endif %}>
-            <h2>✨ Optimized CV instructions </h2>
-            <textarea id="optimized-cv-editor" readonly>{{ ai_suggestions if ai_suggestions else '' }}</textarea>
-            <button type="button" onclick="downloadOptimizedCV()">💾 save instructions</button>
+            <h2>
+                <span class="icon">✨</span>
+                AI-Optimized CV Instructions
+            </h2>
+            <textarea 
+                id="optimized-cv-editor" 
+                readonly>{{ ai_suggestions if ai_suggestions else '' }}</textarea>
+            <button type="button" onclick="downloadOptimizedCV()">
+                <span class="icon">💾</span>
+                Save Instructions
+            </button>
         </div>
 
-        <button type="button" onclick="clearSession()">🚮 Clear Data</button>
+        <button type="button" onclick="clearSession()" class="clear-button">
+            <span class="icon">🗑️</span>
+            Clear Data
+        </button>
     </div>
 
     <script>

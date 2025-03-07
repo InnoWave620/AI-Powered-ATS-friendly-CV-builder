@@ -1,142 +1,192 @@
 from flask import Flask, request, render_template, jsonify, send_file, session
-import os
+from extract_text import extract_text_from_file
+from keyword_extraction import extract_keywords
 from fpdf import FPDF
-from extract_text import extract_text
-from match_keywords import match_keywords
-import groq  # type: ignore
-import spacy
-
-# Load SpaCy model
-nlp = spacy.load("en_core_web_sm")  # Use the small model to reduce size
+import os
+import groq
+import json
 
 app = Flask(__name__)
-app.secret_key = "super_secret_key"
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'your-secret-key-change-this')  # Change this in production
 
-# Groq API Configuration
-GROQ_API_KEY = "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"
-LLAMA_MODEL = "llama3-70b-8192"
+# Initialize Groq client
+if not os.environ.get('GROQ_API_KEY'):
+    print("Warning: GROQ_API_KEY environment variable is not set. AI features will not work.")
+    client = None
+else:
+    client = groq.Groq()
 
-# Upload folder setup
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+def analyze_resume(resume_text, job_description):
+    """Analyze resume against job description using Groq API."""
+    if not client:
+        return {'score': 75, 'analysis': 'AI analysis unavailable - API key not configured', 
+                'missing_elements': ['API key not configured'], 
+                'suggestions': ['Please configure GROQ_API_KEY to enable AI features']}
 
-client = groq.Client(api_key=GROQ_API_KEY)
+    prompt = f"""You are an expert ATS (Applicant Tracking System) and resume analyzer. 
+    Analyze the following resume against the job description and provide:
+    1. A score out of 100
+    2. A detailed analysis of the match
+    3. Key missing elements
+    4. Specific improvement suggestions
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    """Handles resume scanning and displays results."""
-    if request.method == "POST":
-        if "resume" not in request.files or "job_description" not in request.form:
-            return "Missing file or job description", 400
+    Job Description:
+    {job_description}
 
-        resume = request.files["resume"]
-        job_description = request.form["job_description"].strip()
+    Resume:
+    {resume_text}
 
-        if resume.filename == "":
-            return "No selected file", 400
-        if job_description == "":
-            return "Job description cannot be empty", 400
-
-        file_path = os.path.join(UPLOAD_FOLDER, resume.filename)
-        resume.save(file_path)
-
-        try:
-            resume_text = extract_text(file_path)
-            print("✅ Extracted Resume Text:", resume_text[:500])  # Debugging
-        except Exception as e:
-            print(f"❌ Error extracting text: {e}")
-            return "Failed to extract text from resume", 500
-
-        # Calculate ATS score
-        score, matches = match_keywords(resume_text, job_description)
-        print("✅ ATS Score:", score)  # Debugging
-
-        # Store values in session
-        session["resume_text"] = resume_text
-        session["job_description"] = job_description
-        session["score"] = score
-        session["ai_suggestions"] = None  # Reset AI suggestions
-
-        print("🔹 Session Data After Scan:", session)  # Debugging
-
-    return render_template(
-        "index.html",
-        score=session.get("score"),
-        resume_text=session.get("resume_text"),
-        job_description=session.get("job_description"),
-        ai_suggestions=session.get("ai_suggestions"),
-    )
-
-
-@app.route("/generate-ai", methods=["POST"])
-def generate_ai():
-    """Uses AI to analyze or optimize the resume."""
-    data = request.get_json()
-    field = data.get("field")
-    job_description = data.get("job_description")
-    resume_text = data.get("resume_text")
-
-    print("🔹 Job Description:", job_description)  # Debugging
-    print("🔹 Resume Text:", resume_text)  # Debugging
-
-    if not job_description or not resume_text:
-        return jsonify({"error": "Job description or resume text is missing."}), 400
-
-    prompts = {
-        "analyze": f"Analyze this resume's compatibility with the following job description:\n\n{resume_text}\n\nJob Description:\n{job_description}",
-        "optimize": f"Optimize this resume for the given job description:\n\n{resume_text}\n\nJob Description:\n{job_description}",
-    }
-
-    if field not in prompts:
-        return jsonify({"error": "Invalid field"}), 400
+    Provide the response in JSON format with these keys:
+    - score: number
+    - analysis: string (detailed analysis)
+    - missing_elements: list of strings
+    - suggestions: list of strings
+    """
 
     try:
-        completion = client.chat.completions.create(
-            model=LLAMA_MODEL,
-            messages=[{"role": "user", "content": prompts[field]}],
-            temperature=1,
-            max_tokens=1024,
-            top_p=1,
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model="mixtral-8x7b-32768",
+            temperature=0.5,
+            max_tokens=2000
         )
-
-        suggestion = completion.choices[0].message.content.strip()
-        session["ai_suggestions"] = suggestion  # Store AI output in session
-
-        return jsonify({"suggestion": suggestion})
+        
+        response = chat_completion.choices[0].message.content
+        return json.loads(response)
     except Exception as e:
-        print(f"❌ Error generating AI suggestions: {e}")  # Debugging
-        return jsonify({"error": "AI service is currently unavailable. Try again later."}), 500
+        print(f"Error in AI analysis: {str(e)}")
+        return None
 
+def optimize_resume(resume_text, job_description):
+    """Generate optimization suggestions using Groq API."""
+    if not client:
+        return "AI optimization unavailable - Please configure GROQ_API_KEY to enable AI features"
 
-@app.route("/download-optimized-cv", methods=["POST"])
+    prompt = f"""As an expert resume writer and ATS optimization specialist, provide detailed suggestions 
+    to optimize this resume for the given job description. Focus on:
+    1. Content improvements
+    2. Format optimization
+    3. Keyword optimization
+    4. Specific phrases to add
+    5. Structure recommendations
+
+    Job Description:
+    {job_description}
+
+    Resume:
+    {resume_text}
+
+    Provide very specific, actionable suggestions that will help improve the resume's ATS score.
+    """
+
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model="mixtral-8x7b-32768",
+            temperature=0.7,
+            max_tokens=2000
+        )
+        
+        return chat_completion.choices[0].message.content
+    except Exception as e:
+        print(f"Error in optimization: {str(e)}")
+        return None
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        if 'resume' not in request.files:
+            return jsonify({'error': 'No file uploaded'})
+        
+        file = request.files['resume']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'})
+
+        job_description = request.form.get('job_description', '')
+        
+        # Extract text from the uploaded file
+        resume_text = extract_text_from_file(file)
+        
+        # Store in session
+        session['resume_text'] = resume_text
+        session['job_description'] = job_description
+        
+        # Perform AI analysis
+        analysis_result = analyze_resume(resume_text, job_description)
+        score = analysis_result['score'] if analysis_result else 75
+        
+        return render_template('index.html',
+                             resume_text=resume_text,
+                             job_description=job_description,
+                             score=score)
+    
+    return render_template('index.html')
+
+@app.route('/generate-ai', methods=['POST'])
+def generate_ai():
+    data = request.json
+    field = data.get('field')
+    job_description = data.get('job_description', '')
+    resume_text = data.get('resume_text', '')
+    
+    if not resume_text or not job_description:
+        return jsonify({'error': 'Missing resume text or job description'})
+    
+    if field == "analyze":
+        analysis_result = analyze_resume(resume_text, job_description)
+        if analysis_result:
+            return jsonify({
+                'suggestion': f"""ATS Analysis Results:
+
+Score: {analysis_result['score']}/100
+
+Detailed Analysis:
+{analysis_result['analysis']}
+
+Missing Elements:
+{"".join(['• ' + elem + '\n' for elem in analysis_result['missing_elements']])}
+
+Improvement Suggestions:
+{"".join(['• ' + elem + '\n' for elem in analysis_result['suggestions']])}"""
+            })
+        else:
+            return jsonify({'error': 'Failed to analyze resume'})
+    else:
+        optimization = optimize_resume(resume_text, job_description)
+        if optimization:
+            return jsonify({'suggestion': optimization})
+        else:
+            return jsonify({'error': 'Failed to generate optimization suggestions'})
+
+@app.route('/download-optimized-cv', methods=['POST'])
 def download_optimized_cv():
-    """Converts optimized CV text into a downloadable PDF."""
-    data = request.get_json()
-    content = data.get("content", "")
-
-    if not content.strip():
-        return "No content to generate PDF", 400
-
+    content = request.json.get('content', '')
+    
+    # Create a PDF
     pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
-    pdf.set_font("Arial", "", 12)
-    pdf.multi_cell(0, 10, content)
+    pdf.set_font('Arial', size=12)
+    
+    # Split content into lines and add to PDF
+    lines = content.split('\n')
+    for line in lines:
+        pdf.multi_cell(0, 10, txt=line)
+    
+    # Save PDF to a temporary file
+    temp_file = 'Optimized_CV.pdf'
+    pdf.output(temp_file)
+    
+    try:
+        return send_file(temp_file, as_attachment=True)
+    finally:
+        # Clean up the temporary file
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
 
-    pdf_path = os.path.join(UPLOAD_FOLDER, "Optimized_CV.pdf")
-    pdf.output(pdf_path)
-
-    return send_file(pdf_path, as_attachment=True)
-
-
-@app.route("/clear-session", methods=["GET"])
+@app.route('/clear-session', methods=['GET'])
 def clear_session():
-    """Clears all session data and resets the app."""
     session.clear()
-    return jsonify({"message": "Session cleared"}), 200
+    return '', 204
 
-
-# Ensure the app uses Railway-assigned port
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Get assigned port or default to 5000
-    app.run(host="0.0.0.0", port=port, debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)

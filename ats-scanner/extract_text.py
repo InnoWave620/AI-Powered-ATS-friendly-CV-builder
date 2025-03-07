@@ -1,6 +1,7 @@
 import os
 import pdfplumber
 from docx import Document
+from pdfminer.high_level import extract_text as extract_pdf_text
 
 def extract_text(file_path):
     """
@@ -34,3 +35,28 @@ def extract_text_from_docx(docx_path):
     doc = Document(docx_path)
     text = "\n".join([para.text for para in doc.paragraphs])
     return text.strip()
+
+def extract_text_from_file(file):
+    """Extract text from PDF or DOCX file."""
+    filename = file.filename
+    temp_path = os.path.join('uploads', filename)
+    os.makedirs('uploads', exist_ok=True)
+    
+    try:
+        # Save the uploaded file temporarily
+        file.save(temp_path)
+        
+        # Extract text based on file type
+        if filename.lower().endswith('.pdf'):
+            text = extract_pdf_text(temp_path)
+        elif filename.lower().endswith('.docx'):
+            doc = Document(temp_path)
+            text = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
+        else:
+            raise ValueError('Unsupported file format')
+        
+        return text.strip()
+    finally:
+        # Clean up the temporary file
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
