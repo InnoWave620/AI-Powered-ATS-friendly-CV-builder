@@ -89,5 +89,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Community contributions
 
 ---
-Made with ❤️ by [innowave620](https://github.com/innowave620)
+Made with ❤️ by Senzo Calvin Shinga from [innowave620](https://github.com/innowave620)
 
