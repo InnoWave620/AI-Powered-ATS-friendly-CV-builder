@@ -3,46 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATS Resume Scanner & AI CV Builder</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>ATS Resume Scanner & AI CV Builder - CV Master</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .nav-btn.secondary {
+            background: transparent;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+
+        .nav-btn.secondary:hover {
+             background: #ffd700;
+             color: #1a1a2e;
+         }
+
+         /* Form Container */
+         .form-container {
+             background: rgba(255, 255, 255, 0.05);
+             backdrop-filter: blur(10px);
+             padding: 3rem;
+             border-radius: 20px;
+             border: 1px solid rgba(255, 215, 0, 0.2);
+             margin-bottom: 2rem;
+         }
+
+         .form-group {
+             margin-bottom: 1.5rem;
+         }
+
+         .form-label {
+             display: block;
+             margin-bottom: 0.5rem;
+             font-weight: 600;
+             color: #ffd700;
+             font-size: 1.1rem;
+         }
+
+         .form-textarea {
+             width: 100%;
+             min-height: 200px;
+             padding: 1rem;
+             background: rgba(255, 255, 255, 0.05);
+             border: 1px solid rgba(255, 215, 0, 0.3);
+             border-radius: 10px;
+             color: #ffffff;
+             font-family: inherit;
+             font-size: 1rem;
+             resize: vertical;
+             transition: all 0.3s ease;
+         }
+
+         .form-textarea:focus {
+             outline: none;
+             border-color: #ffd700;
+             box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+         }
+
+         .form-textarea::placeholder {
+             color: rgba(255, 255, 255, 0.5);
+         }
+
+         .file-input {
+             width: 100%;
+             padding: 1rem;
+             background: rgba(255, 255, 255, 0.05);
+             border: 1px solid rgba(255, 215, 0, 0.3);
+             border-radius: 10px;
+             color: #ffffff;
+             font-family: inherit;
+             font-size: 1rem;
+             transition: all 0.3s ease;
+         }
+
+         .file-input:focus {
+             outline: none;
+             border-color: #ffd700;
+             box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+         }
+
+         /* Buttons */
+         .btn-primary {
+             background: linear-gradient(45deg, #ffd700, #ffed4e);
+             color: #1a1a2e;
+             padding: 15px 30px;
+             border: none;
+             border-radius: 50px;
+             font-weight: bold;
+             font-size: 1.1rem;
+             cursor: pointer;
+             transition: all 0.3s ease;
+             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+             display: inline-flex;
+             align-items: center;
+             gap: 0.5rem;
+             text-decoration: none;
+         }
+
+         .btn-primary:hover {
+             transform: translateY(-2px);
+             box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+         }
+
+         .btn-secondary {
+             background: transparent;
+             color: #ffd700;
+             padding: 12px 24px;
+             border: 1px solid #ffd700;
+             border-radius: 25px;
+             font-weight: 500;
+             cursor: pointer;
+             transition: all 0.3s ease;
+             display: inline-flex;
+             align-items: center;
+             gap: 0.5rem;
+             text-decoration: none;
+         }
+
+         .btn-secondary:hover {
+             background: #ffd700;
+             color: #1a1a2e;
+         }
+
+         .btn-danger {
+             background: transparent;
+             color: #ff6b6b;
+             padding: 12px 24px;
+             border: 1px solid #ff6b6b;
+             border-radius: 25px;
+             font-weight: 500;
+             cursor: pointer;
+             transition: all 0.3s ease;
+             display: inline-flex;
+             align-items: center;
+             gap: 0.5rem;
+         }
+
+         .btn-danger:hover {
+             background: #ff6b6b;
+             color: #ffffff;
+         }
+
+         /* Results Containers */
+         .results-container {
+             background: rgba(255, 255, 255, 0.05);
+             backdrop-filter: blur(10px);
+             padding: 2rem;
+             border-radius: 15px;
+             border: 1px solid rgba(255, 215, 0, 0.2);
+             margin-bottom: 2rem;
+             display: none;
+         }
+
+         .results-container h2 {
+             color: #ffd700;
+             margin-bottom: 1.5rem;
+             font-size: 1.5rem;
+         }
+
+         .score-display {
+             text-align: center;
+             margin-bottom: 2rem;
+         }
+
+         .score-value {
+             font-size: 3rem;
+             font-weight: bold;
+             color: #ffd700;
+             margin-top: 1rem;
+         }
+
+         .action-buttons {
+             display: flex;
+             gap: 1rem;
+             justify-content: center;
+             margin-bottom: 2rem;
+             flex-wrap: wrap;
+         }
+
+         .result-item {
+             margin-bottom: 1.5rem;
+         }
+
+         .result-item strong {
+             color: #ffd700;
+             display: block;
+             margin-bottom: 0.5rem;
+         }
+
+         .result-content {
+             background: rgba(255, 255, 255, 0.05);
+             padding: 1rem;
+             border-radius: 8px;
+             border: 1px solid rgba(255, 215, 0, 0.1);
+             max-height: 200px;
+             overflow-y: auto;
+         }
+
+         .analysis-result {
+             margin-top: 1rem;
+             padding: 1rem;
+             background: rgba(255, 255, 255, 0.05);
+             border-radius: 8px;
+             border: 1px solid rgba(255, 215, 0, 0.1);
+         }
+
+         .clear-section {
+             text-align: center;
+             margin-top: 2rem;
+         }
+
+         /* Responsive */
+         @media (max-width: 768px) {
+             .nav-buttons {
+                 flex-direction: column;
+                 align-items: center;
+             }
+
+             .nav-btn {
+                 width: 100%;
+                 max-width: 300px;
+                 justify-content: center;
+             }
+
+             .form-container {
+                 padding: 2rem 1.5rem;
+             }
+
+             .action-buttons {
+                 flex-direction: column;
+                 align-items: center;
+             }
+
+             .btn-primary,
+             .btn-secondary {
+                 width: 100%;
+                 max-width: 300px;
+                 justify-content: center;
+             }
+         }
+     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🛠️ ATS Resume Scanner & AI CV Enhancer</h1>
-        <p>Upload your resume and paste a job description to check your ATS compatibility or build an AI-enhanced CV.</p>
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-crown"></i> CV Master
+            </div>
+            <p class="subtitle">Upload your resume and paste a job description to check your ATS compatibility or build an AI-enhanced CV.</p>
+        </div>
+        
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+            <a href="/" class="nav-btn">
+                <i class="fas fa-search"></i> ATS Scanner
+            </a>
+            <a href="/cv-builder" class="nav-btn secondary">
+                <i class="fas fa-tools"></i> CV Builder
+            </a>
+        </div>
 
         <!-- Resume Scan Form -->
-        <form method="POST" enctype="multipart/form-data" autocomplete="off" id="resumeForm">
-            <textarea name="job_description" id="job-description" placeholder="Paste Job Description Here" required>{{ job_description or '' }}</textarea>
-            <input type="file" name="resume" id="resume-file" accept=".pdf,.docx">
-            <button type="submit">🖨 Scan Resume</button>
-        </form>
+        <div class="form-container">
+            <form method="POST" enctype="multipart/form-data" autocomplete="off" id="resumeForm">
+                <div class="form-group">
+                    <label for="job-description" class="form-label">
+                        <i class="fas fa-briefcase"></i> Job Description
+                    </label>
+                    <textarea name="job_description" id="job-description" class="form-textarea" placeholder="Paste the complete job description here..." required>{{ job_description or '' }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="resume-file" class="form-label">
+                        <i class="fas fa-file-upload"></i> Upload Resume
+                    </label>
+                    <input type="file" name="resume" id="resume-file" class="file-input" accept=".pdf,.docx">
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-search"></i> Scan Resume
+                </button>
+            </form>
+        </div>
 
         <!-- AI ATS Score & Analysis -->
-        <div class="results" id="results-section" {% if score is not none %}style="display: block;"{% endif %}>
-            <h2>✅ AI-Generated ATS Score: <span id="ats-score">{{ score if score else 'N/A' }}</span>%</h2>
-            <button type="button" onclick="analyzeATS()">🤖 AI Analyze Score</button>
-            <button type="button" onclick="optimizeCV()">✨ AI Optimize CV</button>
-            <div id="ai-analysis"></div>
+        <div class="results-container" id="results-section" {% if score is not none %}style="display: block;"{% endif %}>
+            <div class="score-display">
+                <h2><i class="fas fa-chart-line"></i> AI-Generated ATS Score</h2>
+                <div class="score-value">
+                    <span id="ats-score">{{ score if score else 'N/A' }}</span>%
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button type="button" class="btn-secondary" onclick="analyzeATS()">
+                    <i class="fas fa-robot"></i> AI Analyze Score
+                </button>
+                <button type="button" class="btn-primary" onclick="optimizeCV()">
+                    <i class="fas fa-magic"></i> AI Optimize CV
+                </button>
+            </div>
+            <div id="ai-analysis" class="analysis-result"></div>
         </div>
 
         <!-- Resume Scan Results -->
-        <div class="results" id="resume-results" {% if resume_text is not none %}style="display: block;"{% endif %}>
-            <h2>✅ Resume Successfully Scanned</h2>
-            <p><strong>Job Description:</strong> <span id="job-desc">{{ job_description if job_description else '' }}</span></p>
-            <p><strong>Extracted Resume Text:</strong> 
-                <span id="resume-text">{{ resume_text[:500] if resume_text else 'No resume scanned yet' }}...</span>
-            </p>
+        <div class="results-container" id="resume-results" {% if resume_text is not none %}style="display: block;"{% endif %}>
+            <h2><i class="fas fa-check-circle"></i> Resume Successfully Scanned</h2>
+            <div class="result-item">
+                <strong>Job Description:</strong>
+                <div class="result-content" id="job-desc">{{ job_description if job_description else '' }}</div>
+            </div>
+            <div class="result-item">
+                <strong>Extracted Resume Text:</strong>
+                <div class="result-content" id="resume-text">{{ resume_text[:500] if resume_text else 'No resume scanned yet' }}...</div>
+            </div>
         </div>
 
         <!-- Optimized CV Section -->
-        <div id="optimized-cv-section" {% if ai_suggestions is not none %}style="display: block;"{% endif %}>
-            <h2>✨ Optimized CV instructions </h2>
-            <textarea id="optimized-cv-editor" readonly>{{ ai_suggestions if ai_suggestions else '' }}</textarea>
-            <button type="button" onclick="downloadOptimizedCV()">💾 save instructions</button>
+        <div class="results-container" id="optimized-cv-section" {% if ai_suggestions is not none %}style="display: block;"{% endif %}>
+            <h2><i class="fas fa-magic"></i> Optimized CV Instructions</h2>
+            <textarea id="optimized-cv-editor" class="form-textarea" readonly>{{ ai_suggestions if ai_suggestions else '' }}</textarea>
+            <button type="button" class="btn-primary" onclick="downloadOptimizedCV()">
+                <i class="fas fa-download"></i> Save Instructions
+            </button>
         </div>
 
-        <button type="button" onclick="clearSession()">🚮 Clear Data</button>
+        <div class="clear-section">
+            <button type="button" class="btn-danger" onclick="clearSession()">
+                <i class="fas fa-trash"></i> Clear Data
+            </button>
+        </div>
     </div>
 
     <script>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - CV Master</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-file-alt"></i>
+                <span>CV Master</span>
+            </div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}" data-aos="fade-down">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' }}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="payment-container" data-aos="fade-up">
+                <div class="payment-header">
+                    <div class="service-icon">
+                        <i class="fas fa-{{ 'search' if service == 'ats_scan' else 'file-alt' }}"></i>
+                    </div>
+                    <h1>Complete Your Payment</h1>
+                    <p>{{ service.replace('_', ' ').title() }} Service</p>
+                </div>
+
+                <div class="payment-summary" data-aos="fade-up" data-aos-delay="200">
+                    <div class="summary-card">
+                        <h3>Order Summary</h3>
+                        <div class="summary-item">
+                            <span class="item-name">{{ service.replace('_', ' ').title() }}</span>
+                            <span class="item-price">R{{ "%.2f"|format(amount) }}</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-total">
+                            <span class="total-label">Total</span>
+                            <span class="total-amount">R{{ "%.2f"|format(amount) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-method" data-aos="fade-up" data-aos-delay="300">
+                    <div class="method-card">
+                        <div class="method-header">
+                            <i class="fas fa-credit-card"></i>
+                            <h3>Secure Payment with PayFast</h3>
+                        </div>
+                        <div class="method-description">
+                            <p>Pay securely using your credit card, debit card, or EFT through PayFast's trusted payment gateway.</p>
+                        </div>
+                        <div class="payment-features">
+                            <div class="feature">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>256-bit SSL Encryption</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-lock"></i>
+                                <span>PCI DSS Compliant</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Instant Processing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-form" data-aos="fade-up" data-aos-delay="400">
+                    <form action="{{ payfast_url }}" method="post" id="payfast-form">
+                        {% for key, value in payment_data.items() %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endfor %}
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                                <i class="fas fa-arrow-left"></i>
+                                Back
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-large" id="pay-button">
+                                <i class="fas fa-credit-card"></i>
+                                Pay R{{ "%.2f"|format(amount) }} Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="payment-info" data-aos="fade-up" data-aos-delay="500">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <h4>Instant Access</h4>
+                                <p>Get immediate access to your results after payment</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-download"></i>
+                            <div>
+                                <h4>Download Reports</h4>
+                                <p>Download professional PDF reports anytime</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-headset"></i>
+                            <div>
+                                <h4>24/7 Support</h4>
+                                <p>Get help whenever you need it</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="security-badges" data-aos="fade-up" data-aos-delay="600">
+                    <div class="badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Secure Payment</span>
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-lock"></i>
+                        <span>SSL Protected</span>
+                    </div>
+                    <div class="badge">
+                        <i class="fas fa-certificate"></i>
+                        <span>PayFast Verified</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Payment form handling
+        document.getElementById('payfast-form').addEventListener('submit', function(e) {
+            const payButton = document.getElementById('pay-button');
+            payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            payButton.disabled = true;
+        });
+
+        // Add some payment form validation if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Payment page loaded successfully');
+        });
+    </script>
+</body>
+</html>

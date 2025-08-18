@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - CV Master</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-file-alt"></i>
+                <span>CV Master</span>
+            </div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="success-container" data-aos="fade-up">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                
+                <div class="success-content">
+                    <h1>Payment Successful!</h1>
+                    <p class="success-message">
+                        Thank you for your payment. Your transaction has been processed successfully.
+                    </p>
+                    
+                    <div class="payment-details" data-aos="fade-up" data-aos-delay="200">
+                        <div class="detail-card">
+                            <h3>Transaction Details</h3>
+                            <div class="detail-item">
+                                <span class="label">Service:</span>
+                                <span class="value">{{ service.replace('_', ' ').title() if service else 'Premium Service' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Amount:</span>
+                                <span class="value">R{{ "%.2f"|format(amount) if amount else '35.00' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Status:</span>
+                                <span class="value status-success">
+                                    <i class="fas fa-check"></i> Completed
+                                </span>
+                            </div>
+                            {% if transaction_id %}
+                            <div class="detail-item">
+                                <span class="label">Transaction ID:</span>
+                                <span class="value">{{ transaction_id }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="next-steps" data-aos="fade-up" data-aos-delay="300">
+                        <h3>What's Next?</h3>
+                        <div class="steps-grid">
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h4>Access Dashboard</h4>
+                                    <p>View your services and download reports</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-download"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h4>Download Results</h4>
+                                    <p>Get your professional CV analysis report</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h4>Email Confirmation</h4>
+                                    <p>Check your email for receipt and details</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons" data-aos="fade-up" data-aos-delay="400">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-large">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Go to Dashboard
+                        </a>
+                        {% if service == 'ats_scan' %}
+                        <a href="{{ url_for('ats_scan') }}" class="btn btn-secondary">
+                            <i class="fas fa-search"></i>
+                            View Results
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="support-info" data-aos="fade-up" data-aos-delay="500">
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="support-content">
+                        <h4>Need Help?</h4>
+                        <p>Our support team is here to assist you with any questions or concerns.</p>
+                        <div class="support-methods">
+                            <div class="support-method">
+                                <i class="fas fa-envelope"></i>
+                                <span>support@cvmaster.com</span>
+                            </div>
+                            <div class="support-method">
+                                <i class="fas fa-phone"></i>
+                                <span>+27 (0) 11 123 4567</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Auto-redirect to dashboard after 10 seconds
+        setTimeout(function() {
+            const redirectNotice = document.createElement('div');
+            redirectNotice.className = 'redirect-notice';
+            redirectNotice.innerHTML = `
+                <div class="notice-content">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Redirecting to dashboard in <span id="countdown">5</span> seconds...</span>
+                    <button onclick="clearTimeout(redirectTimer); this.parentElement.parentElement.remove();" class="btn-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(redirectNotice);
+            
+            let countdown = 5;
+            const countdownElement = document.getElementById('countdown');
+            const countdownTimer = setInterval(() => {
+                countdown--;
+                if (countdownElement) {
+                    countdownElement.textContent = countdown;
+                }
+                if (countdown <= 0) {
+                    clearInterval(countdownTimer);
+                    window.location.href = '{{ url_for("dashboard") }}';
+                }
+            }, 1000);
+            
+            window.redirectTimer = setTimeout(() => {
+                window.location.href = '{{ url_for("dashboard") }}';
+            }, 5000);
+        }, 10000);
+    </script>
+</body>
+</html>

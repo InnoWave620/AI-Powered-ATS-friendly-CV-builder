@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download - CV Master</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 3rem 0;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+        }
+
+        .download-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Success Animation */
+        .success-animation {
+            margin-bottom: 2rem;
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, #48bb78, #68d391);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: successPulse 2s ease-in-out infinite;
+        }
+
+        .success-icon i {
+            font-size: 3rem;
+            color: #ffffff;
+        }
+
+        @keyframes successPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(72, 187, 120, 0);
+            }
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffffff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .success-message {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Download Card */
+        .download-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .service-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1a2e;
+            font-size: 1.5rem;
+        }
+
+        .service-details h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #ffd700;
+        }
+
+        .service-details p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Download Options */
+        .download-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .download-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .download-option:hover {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.05);
+            transform: translateY(-5px);
+        }
+
+        .download-option i {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .download-option h4 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .download-option p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        /* ATS Score Display */
+        .ats-score {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .score-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-header h4 {
+            font-size: 1.3rem;
+            color: #ffd700;
+        }
+
+        .score-display {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(#ffd700 0deg, #ffd700 {{ (ats_score or 0) * 3.6 }}deg, rgba(255, 215, 0, 0.2) {{ (ats_score or 0) * 3.6 }}deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            width: 90px;
+            height: 90px;
+            background: #1a1a2e;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+            z-index: 1;
+        }
+
+        .score-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 2rem;
+        }
+
+        .flash-message {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .flash-message.error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+        }
+
+        .flash-message.success {
+            background: rgba(72, 187, 120, 0.1);
+            border: 1px solid rgba(72, 187, 120, 0.3);
+            color: #48bb78;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .success-title {
+                font-size: 2rem;
+            }
+
+            .download-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .service-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .download-options {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">
+                <i class="fas fa-crown"></i> CV Master
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="download-container">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">
+                                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Success Animation -->
+                <div class="success-animation" data-aos="zoom-in">
+                    <div class="success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h1 class="success-title">Payment Successful!</h1>
+                    <p class="success-message">
+                        Your payment has been processed successfully. Your premium CV service is now ready for download.
+                    </p>
+                </div>
+
+                <!-- Download Card -->
+                <div class="download-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="service-info">
+                        <div class="service-icon">
+                            {% if service_type == 'scan' %}
+                                <i class="fas fa-search"></i>
+                            {% else %}
+                                <i class="fas fa-hammer"></i>
+                            {% endif %}
+                        </div>
+                        <div class="service-details">
+                            <h3>
+                                {% if service_type == 'scan' %}
+                                    ATS CV Analysis Complete
+                                {% else %}
+                                    Custom CV Generated
+                                {% endif %}
+                            </h3>
+                            <p>
+                                {% if service_type == 'scan' %}
+                                    Your CV has been analyzed and optimized for ATS compatibility
+                                {% else %}
+                                    Your professional CV has been created and tailored to your target job
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if service_type == 'scan' and ats_score %}
+                        <!-- ATS Score Display -->
+                        <div class="ats-score">
+                            <div class="score-header">
+                                <i class="fas fa-chart-line"></i>
+                                <h4>Your ATS Compatibility Score</h4>
+                            </div>
+                            <div class="score-display">
+                                <div class="score-circle">
+                                    <div class="score-value">{{ ats_score }}%</div>
+                                </div>
+                                <div class="score-label">
+                                    {% if ats_score >= 80 %}
+                                        Excellent ATS Compatibility
+                                    {% elif ats_score >= 60 %}
+                                        Good ATS Compatibility
+                                    {% elif ats_score >= 40 %}
+                                        Fair ATS Compatibility
+                                    {% else %}
+                                        Needs Improvement
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Download Options -->
+                    <div class="download-options">
+                        <div class="download-option">
+                            <i class="fas fa-file-pdf"></i>
+                            <h4>Download PDF</h4>
+                            <p>Get your {% if service_type == 'scan' %}optimized CV and analysis report{% else %}custom CV{% endif %} in PDF format</p>
+                            <a href="{{ url_for('download_pdf', report_id=report_id) }}" class="download-btn">
+                                <i class="fas fa-download"></i>
+                                Download PDF
+                            </a>
+                        </div>
+
+                        {% if service_type == 'build' %}
+                            <div class="download-option">
+                                <i class="fas fa-file-word"></i>
+                                <h4>Download Word</h4>
+                                <p>Get your custom CV in editable Word document format</p>
+                                <a href="{{ url_for('download_word', report_id=report_id) }}" class="download-btn">
+                                    <i class="fas fa-download"></i>
+                                    Download Word
+                                </a>
+                            </div>
+                        {% endif %}
+
+                        {% if service_type == 'scan' %}
+                            <div class="download-option">
+                                <i class="fas fa-lightbulb"></i>
+                                <h4>View Suggestions</h4>
+                                <p>See detailed AI-powered improvement suggestions for your CV</p>
+                                <a href="{{ url_for('view_suggestions', report_id=report_id) }}" class="download-btn">
+                                    <i class="fas fa-eye"></i>
+                                    View Suggestions
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Back to Dashboard
+                        </a>
+                        <a href="{{ url_for('home') }}" class="btn btn-secondary">
+                            <i class="fas fa-plus"></i>
+                            Create Another CV
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 600,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Auto-download functionality (optional)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add any auto-download logic here if needed
+            
+            // Track download events
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Add analytics or tracking here
+                    console.log('Download initiated:', this.href);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Builder - CV Master</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 3rem 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffffff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 60%;
+            width: 80%;
+            height: 2px;
+            background: rgba(255, 215, 0, 0.3);
+            z-index: 1;
+        }
+
+        .progress-step.completed::after {
+            background: #ffd700;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            z-index: 2;
+            position: relative;
+        }
+
+        .progress-step.active .step-circle {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            border-color: #ffd700;
+        }
+
+        .progress-step.completed .step-circle {
+            background: #ffd700;
+            color: #1a1a2e;
+            border-color: #ffd700;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .progress-step.active .step-label,
+        .progress-step.completed .step-label {
+            opacity: 1;
+            color: #ffd700;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #ffd700;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Dynamic Sections */
+        .dynamic-section {
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-number {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .remove-section {
+            background: transparent;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .remove-section:hover {
+            background: #ff6b6b;
+            color: #ffffff;
+        }
+
+        .add-section {
+            background: transparent;
+            border: 2px dashed rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .add-section:hover {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ffd700;
+            padding: 12px 24px;
+            border: 1px solid #ffd700;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .form-actions .left {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Job Description Section */
+        .job-description-section {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .job-description-section h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-top: 3px solid #ffd700;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 2rem;
+        }
+
+        .flash-message {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .flash-message.error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+        }
+
+        .flash-message.success {
+            background: rgba(72, 187, 120, 0.1);
+            border: 1px solid rgba(72, 187, 120, 0.3);
+            color: #48bb78;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .form-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-steps {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .progress-step:not(:last-child)::after {
+                display: none;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .left {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">
+                <i class="fas fa-crown"></i> CV Master
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <section class="page-header" data-aos="fade-up">
+                <h1><i class="fas fa-hammer"></i> AI-Powered CV Builder</h1>
+                <p>Create a professional, ATS-optimized CV tailored to your target job with our intelligent builder.</p>
+            </section>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Progress Bar -->
+            <div class="progress-container" data-aos="fade-up" data-aos-delay="100">
+                <div class="progress-steps">
+                    <div class="progress-step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Personal Info</div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Experience</div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Education</div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Skills</div>
+                    </div>
+                    <div class="progress-step" data-step="5">
+                        <div class="step-circle">5</div>
+                        <div class="step-label">Job Target</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="form-container" data-aos="fade-up" data-aos-delay="200">
+                <form id="cvBuilderForm" method="POST">
+                    <!-- Step 1: Personal Information -->
+                    <div class="form-section active" data-step="1">
+                        <h2 class="section-title">
+                            <i class="fas fa-user"></i> Personal Information
+                        </h2>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="firstName" class="form-label">First Name *</label>
+                                <input type="text" name="first_name" id="firstName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName" class="form-label">Last Name *</label>
+                                <input type="text" name="last_name" id="lastName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address *</label>
+                                <input type="email" name="email" id="email" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" name="phone" id="phone" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" name="city" id="city" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" name="country" id="country" class="form-input">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="professionalSummary" class="form-label">Professional Summary</label>
+                            <textarea name="professional_summary" id="professionalSummary" class="form-textarea" placeholder="Brief overview of your professional background and career objectives..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Work Experience -->
+                    <div class="form-section" data-step="2">
+                        <h2 class="section-title">
+                            <i class="fas fa-briefcase"></i> Work Experience
+                        </h2>
+                        
+                        <div id="experienceContainer">
+                            <div class="dynamic-section" data-section="experience" data-index="0">
+                                <div class="section-header">
+                                    <div class="section-number">Experience 1</div>
+                                    <button type="button" class="remove-section" onclick="removeSection(this)" style="display: none;">
+                                        <i class="fas fa-times"></i> Remove
+                                    </button>
+                                </div>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Job Title *</label>
+                                        <input type="text" name="experience[0][title]" class="form-input" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Company *</label>
+                                        <input type="text" name="experience[0][company]" class="form-input" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Start Date *</label>
+                                        <input type="month" name="experience[0][start_date]" class="form-input" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">End Date</label>
+                                        <input type="month" name="experience[0][end_date]" class="form-input" placeholder="Leave blank if current">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Job Description & Achievements</label>
+                                    <textarea name="experience[0][description]" class="form-textarea" placeholder="Describe your responsibilities and key achievements in this role..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="add-section" onclick="addExperience()">
+                            <i class="fas fa-plus"></i> Add Another Experience
+                        </button>
+                    </div>
+
+                    <!-- Step 3: Education -->
+                    <div class="form-section" data-step="3">
+                        <h2 class="section-title">
+                            <i class="fas fa-graduation-cap"></i> Education
+                        </h2>
+                        
+                        <div id="educationContainer">
+                            <div class="dynamic-section" data-section="education" data-index="0">
+                                <div class="section-header">
+                                    <div class="section-number">Education 1</div>
+                                    <button type="button" class="remove-section" onclick="removeSection(this)" style="display: none;">
+                                        <i class="fas fa-times"></i> Remove
+                                    </button>
+                                </div>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Degree/Qualification *</label>
+                                        <input type="text" name="education[0][degree]" class="form-input" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Institution *</label>
+                                        <input type="text" name="education[0][institution]" class="form-input" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Start Year</label>
+                                        <input type="number" name="education[0][start_year]" class="form-input" min="1950" max="2030">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">End Year</label>
+                                        <input type="number" name="education[0][end_year]" class="form-input" min="1950" max="2030">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Additional Details</label>
+                                    <textarea name="education[0][details]" class="form-textarea" placeholder="GPA, honors, relevant coursework, etc..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="add-section" onclick="addEducation()">
+                            <i class="fas fa-plus"></i> Add Another Education
+                        </button>
+                    </div>
+
+                    <!-- Step 4: Skills -->
+                    <div class="form-section" data-step="4">
+                        <h2 class="section-title">
+                            <i class="fas fa-cogs"></i> Skills & Competencies
+                        </h2>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="technicalSkills" class="form-label">Technical Skills</label>
+                                <textarea name="technical_skills" id="technicalSkills" class="form-textarea" placeholder="Programming languages, software, tools, technologies..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="softSkills" class="form-label">Soft Skills</label>
+                                <textarea name="soft_skills" id="softSkills" class="form-textarea" placeholder="Communication, leadership, problem-solving, teamwork..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="languages" class="form-label">Languages</label>
+                                <textarea name="languages" id="languages" class="form-textarea" placeholder="English (Native), Spanish (Fluent), French (Intermediate)..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="certifications" class="form-label">Certifications</label>
+                                <textarea name="certifications" id="certifications" class="form-textarea" placeholder="Professional certifications, licenses, awards..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Job Target -->
+                    <div class="form-section" data-step="5">
+                        <h2 class="section-title">
+                            <i class="fas fa-target"></i> Job Target & Optimization
+                        </h2>
+                        
+                        <div class="job-description-section">
+                            <h3><i class="fas fa-bullseye"></i> Target Job Description</h3>
+                            <p>Paste the job description you're targeting. Our AI will optimize your CV to match the requirements and improve ATS compatibility.</p>
+                            
+                            <div class="form-group">
+                                <label for="jobDescription" class="form-label">Job Description *</label>
+                                <textarea name="job_description" id="jobDescription" class="form-textarea" style="min-height: 200px;" placeholder="Paste the complete job description here. Include requirements, responsibilities, and preferred qualifications for the best optimization..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <div class="left">
+                            <button type="button" class="btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </button>
+                        </div>
+                        <div class="right">
+                            <button type="button" class="btn-secondary" onclick="window.location.href='{{ url_for('dashboard') }}'">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button type="button" class="btn-primary" id="nextBtn" onclick="nextStep()">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                            <button type="submit" class="btn-primary" id="submitBtn" style="display: none;">
+                                <i class="fas fa-magic"></i> Generate CV (R35)
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Loading State -->
+                <div class="loading" id="loadingState">
+                    <div class="spinner"></div>
+                    <h3>Building your professional CV...</h3>
+                    <p>Our AI is crafting a personalized, ATS-optimized CV based on your information and target job. This may take a few moments.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 600,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        let currentStep = 1;
+        const totalSteps = 5;
+        let experienceCount = 1;
+        let educationCount = 1;
+
+        // Step navigation
+        function nextStep() {
+            if (validateCurrentStep()) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateStep();
+                }
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStep();
+            }
+        }
+
+        function updateStep() {
+            // Update progress bar
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                const stepNum = index + 1;
+                step.classList.remove('active', 'completed');
+                
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Update form sections
+            document.querySelectorAll('.form-section').forEach((section, index) => {
+                section.classList.remove('active');
+                if (index + 1 === currentStep) {
+                    section.classList.add('active');
+                }
+            });
+
+            // Update buttons
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+
+            prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
+            
+            if (currentStep === totalSteps) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-flex';
+            } else {
+                nextBtn.style.display = 'inline-flex';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        function validateCurrentStep() {
+            const currentSection = document.querySelector(`.form-section[data-step="${currentStep}"]`);
+            const requiredFields = currentSection.querySelectorAll('[required]');
+            
+            for (let field of requiredFields) {
+                if (!field.value.trim()) {
+                    field.focus();
+                    alert('Please fill in all required fields before proceeding.');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // Dynamic sections
+        function addExperience() {
+            const container = document.getElementById('experienceContainer');
+            const newSection = createExperienceSection(experienceCount);
+            container.appendChild(newSection);
+            experienceCount++;
+            updateRemoveButtons('experience');
+        }
+
+        function addEducation() {
+            const container = document.getElementById('educationContainer');
+            const newSection = createEducationSection(educationCount);
+            container.appendChild(newSection);
+            educationCount++;
+            updateRemoveButtons('education');
+        }
+
+        function createExperienceSection(index) {
+            const section = document.createElement('div');
+            section.className = 'dynamic-section';
+            section.setAttribute('data-section', 'experience');
+            section.setAttribute('data-index', index);
+            
+            section.innerHTML = `
+                <div class="section-header">
+                    <div class="section-number">Experience ${index + 1}</div>
+                    <button type="button" class="remove-section" onclick="removeSection(this)">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Job Title *</label>
+                        <input type="text" name="experience[${index}][title]" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Company *</label>
+                        <input type="text" name="experience[${index}][company]" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Date *</label>
+                        <input type="month" name="experience[${index}][start_date]" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Date</label>
+                        <input type="month" name="experience[${index}][end_date]" class="form-input" placeholder="Leave blank if current">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Job Description & Achievements</label>
+                    <textarea name="experience[${index}][description]" class="form-textarea" placeholder="Describe your responsibilities and key achievements in this role..."></textarea>
+                </div>
+            `;
+            
+            return section;
+        }
+
+        function createEducationSection(index) {
+            const section = document.createElement('div');
+            section.className = 'dynamic-section';
+            section.setAttribute('data-section', 'education');
+            section.setAttribute('data-index', index);
+            
+            section.innerHTML = `
+                <div class="section-header">
+                    <div class="section-number">Education ${index + 1}</div>
+                    <button type="button" class="remove-section" onclick="removeSection(this)">
+                        <i class="fas fa-times"></i> Remove
+                    </button>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Degree/Qualification *</label>
+                        <input type="text" name="education[${index}][degree]" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Institution *</label>
+                        <input type="text" name="education[${index}][institution]" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Year</label>
+                        <input type="number" name="education[${index}][start_year]" class="form-input" min="1950" max="2030">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Year</label>
+                        <input type="number" name="education[${index}][end_year]" class="form-input" min="1950" max="2030">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Additional Details</label>
+                    <textarea name="education[${index}][details]" class="form-textarea" placeholder="GPA, honors, relevant coursework, etc..."></textarea>
+                </div>
+            `;
+            
+            return section;
+        }
+
+        function removeSection(button) {
+            const section = button.closest('.dynamic-section');
+            const sectionType = section.getAttribute('data-section');
+            section.remove();
+            updateRemoveButtons(sectionType);
+        }
+
+        function updateRemoveButtons(sectionType) {
+            const sections = document.querySelectorAll(`[data-section="${sectionType}"]`);
+            sections.forEach((section, index) => {
+                const removeBtn = section.querySelector('.remove-section');
+                const numberLabel = section.querySelector('.section-number');
+                
+                // Update numbering
+                const type = sectionType.charAt(0).toUpperCase() + sectionType.slice(1);
+                numberLabel.textContent = `${type} ${index + 1}`;
+                
+                // Show/hide remove button
+                removeBtn.style.display = sections.length > 1 ? 'block' : 'none';
+            });
+        }
+
+        // Form submission
+        document.getElementById('cvBuilderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateCurrentStep()) {
+                return;
+            }
+
+            // Show loading state
+            document.querySelector('.form-container').style.display = 'none';
+            document.getElementById('loadingState').classList.add('show');
+            
+            // Submit form
+            const formData = new FormData(this);
+            
+            fetch(this.action || window.location.pathname, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    return response.text();
+                }
+            })
+            .then(html => {
+                if (html) {
+                    document.body.innerHTML = html;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                document.querySelector('.form-container').style.display = 'block';
+                document.getElementById('loadingState').classList.remove('show');
+            });
+        });
+
+        // Initialize remove button visibility
+        updateRemoveButtons('experience');
+        updateRemoveButtons('education');
+    </script>
+</body>
+</html>

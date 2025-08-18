@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Improvement Suggestions - CV Master</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 3rem 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffffff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ATS Score Summary */
+        .score-summary {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(#ffd700 0deg, #ffd700 {{ (ats_score or 0) * 3.6 }}deg, rgba(255, 215, 0, 0.2) {{ (ats_score or 0) * 3.6 }}deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: scoreRotate 2s ease-in-out;
+        }
+
+        .score-circle::before {
+            content: '';
+            width: 90px;
+            height: 90px;
+            background: #1a1a2e;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+            z-index: 1;
+        }
+
+        @keyframes scoreRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .score-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #ffd700;
+        }
+
+        .score-status {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .score-description {
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 400px;
+        }
+
+        /* Suggestions Grid */
+        .suggestions-grid {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .suggestion-category {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1a2e;
+            font-size: 1.5rem;
+        }
+
+        .category-info h3 {
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin-bottom: 0.25rem;
+        }
+
+        .category-info p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .suggestions-list {
+            list-style: none;
+        }
+
+        .suggestion-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            border-color: rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .suggestion-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .suggestion-priority {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-high {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .priority-medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .priority-low {
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+            border: 1px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .suggestion-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            flex: 1;
+        }
+
+        .suggestion-description {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .suggestion-example {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .example-label {
+            font-size: 0.9rem;
+            color: #ffd700;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .example-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-style: italic;
+        }
+
+        /* Missing Keywords */
+        .missing-keywords {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            margin-bottom: 3rem;
+        }
+
+        .keywords-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .keywords-header h3 {
+            font-size: 1.5rem;
+            color: #ffd700;
+        }
+
+        .keywords-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .keyword-item {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .keyword-item:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .keyword-text {
+            font-weight: 600;
+            color: #ff6b6b;
+            margin-bottom: 0.5rem;
+        }
+
+        .keyword-importance {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary:hover {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 2rem;
+        }
+
+        .flash-message {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .flash-message.error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+        }
+
+        .flash-message.success {
+            background: rgba(72, 187, 120, 0.1);
+            border: 1px solid rgba(72, 187, 120, 0.3);
+            color: #48bb78;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .score-display {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .score-summary,
+            .suggestion-category,
+            .missing-keywords {
+                padding: 2rem 1.5rem;
+            }
+
+            .category-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .suggestion-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .keywords-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">
+                <i class="fas fa-crown"></i> CV Master
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <section class="page-header" data-aos="fade-up">
+                <h1><i class="fas fa-lightbulb"></i> CV Improvement Suggestions</h1>
+                <p>AI-powered recommendations to optimize your CV for better ATS compatibility and job matching.</p>
+            </section>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }}">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- ATS Score Summary -->
+            <section class="score-summary" data-aos="fade-up" data-aos-delay="100">
+                <div class="score-display">
+                    <div class="score-circle">
+                        <div class="score-value">{{ ats_score or 0 }}%</div>
+                    </div>
+                    <div class="score-info">
+                        <h3>Current ATS Score</h3>
+                        <div class="score-status">
+                            {% if (ats_score or 0) >= 80 %}
+                                <span style="color: #48bb78;">Excellent Compatibility</span>
+                            {% elif (ats_score or 0) >= 60 %}
+                                <span style="color: #ffc107;">Good Compatibility</span>
+                            {% elif (ats_score or 0) >= 40 %}
+                                <span style="color: #ff9800;">Fair Compatibility</span>
+                            {% else %}
+                                <span style="color: #ff6b6b;">Needs Improvement</span>
+                            {% endif %}
+                        </div>
+                        <p class="score-description">
+                            {% if (ats_score or 0) >= 80 %}
+                                Your CV has excellent ATS compatibility. Minor optimizations can make it even better.
+                            {% elif (ats_score or 0) >= 60 %}
+                                Your CV has good ATS compatibility. Follow the suggestions below to improve further.
+                            {% elif (ats_score or 0) >= 40 %}
+                                Your CV has fair ATS compatibility. Implementing these suggestions will significantly improve your chances.
+                            {% else %}
+                                Your CV needs significant improvements for better ATS compatibility. Focus on high-priority suggestions first.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Missing Keywords -->
+            {% if missing_keywords %}
+            <section class="missing-keywords" data-aos="fade-up" data-aos-delay="200">
+                <div class="keywords-header">
+                    <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 1.5rem;"></i>
+                    <h3>Missing Important Keywords</h3>
+                </div>
+                <p style="margin-bottom: 2rem; color: rgba(255, 255, 255, 0.8);">
+                    These keywords from the job description are missing from your CV. Consider incorporating them naturally into your content.
+                </p>
+                <div class="keywords-grid">
+                    {% for keyword in missing_keywords %}
+                    <div class="keyword-item">
+                        <div class="keyword-text">{{ keyword.word }}</div>
+                        <div class="keyword-importance">{{ keyword.importance }} importance</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Suggestions Grid -->
+            <section class="suggestions-grid" data-aos="fade-up" data-aos-delay="300">
+                <!-- Format & Structure Suggestions -->
+                <div class="suggestion-category">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="category-info">
+                            <h3>Format & Structure</h3>
+                            <p>Optimize your CV's layout and formatting for better ATS parsing</p>
+                        </div>
+                    </div>
+                    <ul class="suggestions-list">
+                        {% for suggestion in format_suggestions or [] %}
+                        <li class="suggestion-item">
+                            <div class="suggestion-header">
+                                <span class="suggestion-priority priority-{{ suggestion.priority }}">
+                                    {{ suggestion.priority }}
+                                </span>
+                                <div class="suggestion-title">{{ suggestion.title }}</div>
+                            </div>
+                            <div class="suggestion-description">{{ suggestion.description }}</div>
+                            {% if suggestion.example %}
+                            <div class="suggestion-example">
+                                <div class="example-label">
+                                    <i class="fas fa-quote-left"></i>
+                                    Example:
+                                </div>
+                                <div class="example-text">{{ suggestion.example }}</div>
+                            </div>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                        
+                        <!-- Default suggestions if none provided -->
+                        {% if not format_suggestions %}
+                        <li class="suggestion-item">
+                            <div class="suggestion-header">
+                                <span class="suggestion-priority priority-high">High</span>
+                                <div class="suggestion-title">Use Standard Section Headers</div>
+                            </div>
+                            <div class="suggestion-description">Use conventional section headers like "Work Experience", "Education", "Skills" that ATS systems can easily recognize.</div>
+                            <div class="suggestion-example">
+                                <div class="example-label">
+                                    <i class="fas fa-quote-left"></i>
+                                    Example:
+                                </div>
+                                <div class="example-text">Instead of "My Journey" use "Work Experience"</div>
+                            </div>
+                        </li>
+                        <li class="suggestion-item">
+                            <div class="suggestion-header">
+                                <span class="suggestion-priority priority-medium">Medium</span>
+                                <div class="suggestion-title">Include Contact Information</div>
+                            </div>
+                            <div class="suggestion-description">Ensure your phone number, email, and location are clearly visible at the top of your CV.</div>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Content Suggestions -->
+                <div class="suggestion-category">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="category-info">
+                            <h3>Content Enhancement</h3>
+                            <p>Improve your CV content to better match job requirements</p>
+                        </div>
+                    </div>
+                    <ul class="suggestions-list">
+                        {% for suggestion in content_suggestions or [] %}
+                        <li class="suggestion-item">
+                            <div class="suggestion-header">
+                                <span class="suggestion-priority priority-{{ suggestion.priority }}">
+                                    {{ suggestion.priority }}
+                                </span>
+                                <div class="suggestion-title">{{ suggestion.title }}</div>
+                            </div>
+                            <div class="suggestion-description">{{ suggestion.description }}</div>
+                            {% if suggestion.example %}
+                            <div class="suggestion-example">
+                                <div class="example-label">
+                                    <i class="fas fa-quote-left"></i>
+                                    Example:
+                                </div>
+                                <div class="example-text">{{ suggestion.example }}</div>
+                            </div>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                        
+                        <!-- Default suggestions if none provided -->
+                        {% if not content_suggestions %}
+                        <li class="suggestion-item">
+                            <div class="suggestion-header">
+                                <span class="suggestion-priority priority-high">High</span>
+                                <div class="suggestion-title">Add Quantifiable Achievements</div>
+                            </div>
+                            <div class="suggestion-description">Include specific numbers, percentages, and metrics to demonstrate your impact and results.</div>
+                            <div class="suggestion-example">
+                                <div class="example-label">
+                                    <i class="fas fa-quote-left"></i>
+                                    Example:
+                                </div>
+                                <div class="example-text">"Increased sales by 25% over 6 months" instead of "Improved sales performance"</div>
+                            </div>
+                        </li>
+                        <li class="suggestion-item">
+                            <div class="suggestion-header">
+                                <span class="suggestion-priority priority-medium">Medium</span>
+                                <div class="suggestion-title">Use Action Verbs</div>
+                            </div>
+                            <div class="suggestion-description">Start bullet points with strong action verbs to make your achievements more impactful.</div>
+                            <div class="suggestion-example">
+                                <div class="example-label">
+                                    <i class="fas fa-quote-left"></i>
+                                    Example:
+                                </div>
+                                <div class="example-text">"Managed", "Developed", "Implemented", "Optimized"</div>
+                            </div>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <!-- Keywords & Skills -->
+                <div class="suggestion-category">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                        <div class="category-info">
+                            <h3>Keywords & Skills</h3>
+                            <p>Optimize keyword usage to match job requirements</p>
+                        </div>
+                    </div>
+                    <ul class="suggestions-list">
+                        {% for suggestion in keyword_suggestions or [] %}
+                        <li class="suggestion-item">
+                            <div class="suggestion-header">
+                                <span class="suggestion-priority priority-{{ suggestion.priority }}">
+                                    {{ suggestion.priority }}
+                                </span>
+                                <div class="suggestion-title">{{ suggestion.title }}</div>
+                            </div>
+                            <div class="suggestion-description">{{ suggestion.description }}</div>
+                            {% if suggestion.example %}
+                            <div class="suggestion-example">
+                                <div class="example-label">
+                                    <i class="fas fa-quote-left"></i>
+                                    Example:
+                                </div>
+                                <div class="example-text">{{ suggestion.example }}</div>
+                            </div>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                        
+                        <!-- Default suggestions if none provided -->
+                        {% if not keyword_suggestions %}
+                        <li class="suggestion-item">
+                            <div class="suggestion-header">
+                                <span class="suggestion-priority priority-high">High</span>
+                                <div class="suggestion-title">Include Job-Specific Keywords</div>
+                            </div>
+                            <div class="suggestion-description">Incorporate relevant keywords from the job description naturally throughout your CV.</div>
+                        </li>
+                        <li class="suggestion-item">
+                            <div class="suggestion-header">
+                                <span class="suggestion-priority priority-medium">Medium</span>
+                                <div class="suggestion-title">Add Technical Skills Section</div>
+                            </div>
+                            <div class="suggestion-description">Create a dedicated skills section with relevant technical and soft skills.</div>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="action-buttons" data-aos="fade-up" data-aos-delay="400">
+                <a href="{{ url_for('download_pdf', report_id=report_id) }}" class="btn btn-primary">
+                    <i class="fas fa-download"></i>
+                    Download Full Report
+                </a>
+                <a href="{{ url_for('cv_builder') }}" class="btn btn-secondary">
+                    <i class="fas fa-hammer"></i>
+                    Build New CV
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Back to Dashboard
+                </a>
+            </section>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 600,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Copy keyword functionality
+        document.querySelectorAll('.keyword-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const keyword = this.querySelector('.keyword-text').textContent;
+                navigator.clipboard.writeText(keyword).then(() => {
+                    // Show temporary feedback
+                    const originalBg = this.style.background;
+                    this.style.background = 'rgba(72, 187, 120, 0.2)';
+                    this.style.borderColor = 'rgba(72, 187, 120, 0.5)';
+                    
+                    setTimeout(() => {
+                        this.style.background = originalBg;
+                        this.style.borderColor = 'rgba(255, 107, 107, 0.3)';
+                    }, 1000);
+                }).catch(err => {
+                    console.error('Failed to copy keyword:', err);
+                });
+            });
+        });
+
+        // Suggestion item interactions
+        document.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Add click animation or functionality here
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Cancelled - CV Master</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-file-alt"></i>
+                <span>CV Master</span>
+            </div>
+            <div class="nav-menu">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="cancel-container" data-aos="fade-up">
+                <div class="cancel-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                
+                <div class="cancel-content">
+                    <h1>Payment Cancelled</h1>
+                    <p class="cancel-message">
+                        Your payment has been cancelled. No charges have been made to your account.
+                    </p>
+                    
+                    <div class="cancel-details" data-aos="fade-up" data-aos-delay="200">
+                        <div class="detail-card">
+                            <h3>Transaction Details</h3>
+                            <div class="detail-item">
+                                <span class="label">Service:</span>
+                                <span class="value">{{ service.replace('_', ' ').title() if service else 'Premium Service' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Amount:</span>
+                                <span class="value">R{{ "%.2f"|format(amount) if amount else '35.00' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Status:</span>
+                                <span class="value status-cancelled">
+                                    <i class="fas fa-times"></i> Cancelled
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="next-steps" data-aos="fade-up" data-aos-delay="300">
+                        <h3>What Would You Like To Do?</h3>
+                        <div class="steps-grid">
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-redo"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h4>Try Again</h4>
+                                    <p>Complete your payment to access the service</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h4>Return to Dashboard</h4>
+                                    <p>Browse other services and features</p>
+                                </div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                </div>
+                                <div class="step-content">
+                                    <h4>Need Help?</h4>
+                                    <p>Contact our support team for assistance</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons" data-aos="fade-up" data-aos-delay="400">
+                        {% if service %}
+                        <a href="{{ url_for('payment', service=service) }}" class="btn btn-primary btn-large">
+                            <i class="fas fa-redo"></i>
+                            Try Payment Again
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="why-choose-us" data-aos="fade-up" data-aos-delay="500">
+                <div class="features-card">
+                    <h3>Why Choose CV Master?</h3>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>AI-Powered Analysis</h4>
+                                <p>Advanced algorithms analyze your CV for ATS compatibility</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Detailed Reports</h4>
+                                <p>Get comprehensive feedback and improvement suggestions</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Secure & Private</h4>
+                                <p>Your data is protected with enterprise-grade security</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="feature-content">
+                                <h4>Instant Results</h4>
+                                <p>Get your analysis results within minutes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="support-info" data-aos="fade-up" data-aos-delay="600">
+                <div class="support-card">
+                    <div class="support-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="support-content">
+                        <h4>Having Payment Issues?</h4>
+                        <p>Our support team is ready to help you complete your purchase.</p>
+                        <div class="support-methods">
+                            <div class="support-method">
+                                <i class="fas fa-envelope"></i>
+                                <span>support@cvmaster.com</span>
+                            </div>
+                            <div class="support-method">
+                                <i class="fas fa-phone"></i>
+                                <span>+27 (0) 11 123 4567</span>
+                            </div>
+                            <div class="support-method">
+                                <i class="fas fa-comments"></i>
+                                <span>Live Chat Available</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Track cancellation for analytics
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Payment cancelled - tracking event');
+            // Add analytics tracking here if needed
+        });
+    </script>
+</body>
+</html>
