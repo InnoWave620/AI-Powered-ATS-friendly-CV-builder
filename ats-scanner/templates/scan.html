@@ -169,6 +169,11 @@
              height: 100%;
              opacity: 0;
              cursor: pointer;
+             z-index: 2;
+         }
+
+         .file-upload-text {
+             pointer-events: none;
          }
 
          .file-upload-text {
@@ -345,6 +350,270 @@
              line-height: 1.6;
          }
 
+         /* Footer */
+         .footer {
+             background: rgba(0, 0, 0, 0.4);
+             backdrop-filter: blur(10px);
+             border-top: 1px solid rgba(255, 215, 0, 0.2);
+             padding: 3rem 0 1rem;
+             margin-top: 4rem;
+         }
+
+         .footer-content {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+             gap: 2rem;
+             margin-bottom: 2rem;
+         }
+
+         .footer-section h3 {
+             color: #ffd700;
+             margin-bottom: 1rem;
+             font-size: 1.5rem;
+         }
+
+         .footer-section h4 {
+             color: #ffd700;
+             margin-bottom: 0.8rem;
+             font-size: 1.1rem;
+         }
+
+         .footer-section p {
+             opacity: 0.9;
+             margin-bottom: 0.5rem;
+         }
+
+         .footer-section ul {
+             list-style: none;
+         }
+
+         .footer-section ul li {
+             padding: 0.3rem 0;
+             opacity: 0.8;
+             transition: opacity 0.3s ease;
+         }
+
+         .footer-section ul li:hover {
+             opacity: 1;
+             color: #ffd700;
+         }
+
+         .footer-bottom {
+             text-align: center;
+             padding-top: 2rem;
+             border-top: 1px solid rgba(255, 255, 255, 0.1);
+             opacity: 0.8;
+         }
+
+         .footer-bottom strong {
+             color: #ffd700;
+         }
+
+         /* Chatbot */
+         .chatbot-container {
+             position: fixed;
+             bottom: 20px;
+             right: 20px;
+             z-index: 1000;
+         }
+
+         .chatbot-toggle {
+             width: 60px;
+             height: 60px;
+             background: linear-gradient(45deg, #ffd700, #ffed4e);
+             border-radius: 50%;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             cursor: pointer;
+             box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+             transition: all 0.3s ease;
+             animation: pulse 2s infinite;
+         }
+
+         .chatbot-toggle:hover {
+             transform: scale(1.1);
+             box-shadow: 0 6px 25px rgba(255, 215, 0, 0.4);
+         }
+
+         .chatbot-toggle i {
+             font-size: 24px;
+             color: #1a1a2e;
+         }
+
+         @keyframes pulse {
+             0% {
+                 box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+             }
+             50% {
+                 box-shadow: 0 4px 20px rgba(255, 215, 0, 0.6);
+             }
+             100% {
+                 box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+             }
+         }
+
+         .chatbot-window {
+             position: absolute;
+             bottom: 80px;
+             right: 0;
+             width: 350px;
+             height: 500px;
+             background: rgba(26, 26, 46, 0.95);
+             backdrop-filter: blur(20px);
+             border-radius: 20px;
+             border: 1px solid rgba(255, 215, 0, 0.3);
+             display: none;
+             flex-direction: column;
+             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+         }
+
+         .chatbot-header {
+             background: linear-gradient(45deg, #ffd700, #ffed4e);
+             color: #1a1a2e;
+             padding: 1rem;
+             border-radius: 20px 20px 0 0;
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+         }
+
+         .chatbot-header h4 {
+             margin: 0;
+             font-size: 1.1rem;
+             font-weight: 600;
+         }
+
+         .chatbot-close {
+             background: none;
+             border: none;
+             color: #1a1a2e;
+             font-size: 18px;
+             cursor: pointer;
+             padding: 5px;
+             border-radius: 50%;
+             transition: background 0.3s ease;
+         }
+
+         .chatbot-close:hover {
+             background: rgba(26, 26, 46, 0.1);
+         }
+
+         .chatbot-messages {
+             flex: 1;
+             padding: 1rem;
+             overflow-y: auto;
+             display: flex;
+             flex-direction: column;
+             gap: 1rem;
+         }
+
+         .chatbot-messages::-webkit-scrollbar {
+             width: 6px;
+         }
+
+         .chatbot-messages::-webkit-scrollbar-track {
+             background: rgba(255, 255, 255, 0.1);
+             border-radius: 3px;
+         }
+
+         .chatbot-messages::-webkit-scrollbar-thumb {
+             background: rgba(255, 215, 0, 0.5);
+             border-radius: 3px;
+         }
+
+         .bot-message, .user-message {
+             max-width: 80%;
+             padding: 0.8rem 1rem;
+             border-radius: 15px;
+             word-wrap: break-word;
+         }
+
+         .bot-message {
+             background: rgba(255, 215, 0, 0.1);
+             border: 1px solid rgba(255, 215, 0, 0.2);
+             align-self: flex-start;
+         }
+
+         .user-message {
+             background: rgba(255, 255, 255, 0.1);
+             border: 1px solid rgba(255, 255, 255, 0.2);
+             align-self: flex-end;
+         }
+
+         .bot-message p, .user-message p {
+             margin: 0;
+             line-height: 1.4;
+         }
+
+         .bot-message ul {
+             margin: 0.5rem 0;
+             padding-left: 1.2rem;
+         }
+
+         .bot-message ul li {
+             margin: 0.3rem 0;
+         }
+
+         .bot-message a {
+             color: #ffd700;
+             text-decoration: none;
+         }
+
+         .bot-message a:hover {
+             text-decoration: underline;
+         }
+
+         .chatbot-input {
+             padding: 1rem;
+             border-top: 1px solid rgba(255, 255, 255, 0.1);
+             display: flex;
+             gap: 0.5rem;
+         }
+
+         .chatbot-input input {
+             flex: 1;
+             background: rgba(255, 255, 255, 0.1);
+             border: 1px solid rgba(255, 255, 255, 0.2);
+             border-radius: 25px;
+             padding: 0.8rem 1rem;
+             color: #ffffff;
+             font-size: 0.9rem;
+             outline: none;
+             transition: all 0.3s ease;
+         }
+
+         .chatbot-input input:focus {
+             border-color: rgba(255, 215, 0, 0.5);
+             box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
+         }
+
+         .chatbot-input input::placeholder {
+             color: rgba(255, 255, 255, 0.6);
+         }
+
+         .chatbot-input button {
+             background: linear-gradient(45deg, #ffd700, #ffed4e);
+             border: none;
+             border-radius: 50%;
+             width: 40px;
+             height: 40px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             cursor: pointer;
+             transition: all 0.3s ease;
+         }
+
+         .chatbot-input button:hover {
+             transform: scale(1.1);
+         }
+
+         .chatbot-input button i {
+             color: #1a1a2e;
+             font-size: 16px;
+         }
+
          /* Responsive */
          @media (max-width: 768px) {
              .nav-links {
@@ -369,6 +638,21 @@
 
              .features-grid {
                  grid-template-columns: 1fr;
+             }
+
+             .footer-content {
+                 grid-template-columns: 1fr;
+                 text-align: center;
+             }
+
+             .chatbot-window {
+                 width: 300px;
+                 height: 450px;
+             }
+
+             .chatbot-container {
+                 bottom: 15px;
+                 right: 15px;
              }
          }
      </style>
@@ -415,7 +699,7 @@
                         <label for="cv_file" class="form-label">
                             <i class="fas fa-file-upload"></i> Upload Your CV
                         </label>
-                        <div class="file-upload-area" onclick="document.getElementById('cv_file').click()">
+                        <div class="file-upload-area">
                             <input type="file" id="cv_file" name="cv_file" accept=".pdf,.doc,.docx" required>
                             <div class="file-upload-text">
                                 <i class="fas fa-cloud-upload-alt"></i>
@@ -517,6 +801,150 @@
                 uploadText.textContent = 'Click to upload your CV';
             }
         });
+
+        // Chatbot functionality
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbot-window');
+            if (chatbotWindow.style.display === 'none' || chatbotWindow.style.display === '') {
+                chatbotWindow.style.display = 'flex';
+            } else {
+                chatbotWindow.style.display = 'none';
+            }
+        }
+
+        function sendChatbotMessage() {
+            const input = document.getElementById('chatbot-message');
+            const message = input.value.trim();
+            if (message) {
+                const messagesContainer = document.getElementById('chatbot-messages');
+                
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'user-message';
+                userMessage.innerHTML = '<p>' + message + '</p>';
+                messagesContainer.appendChild(userMessage);
+                
+                // Add loading indicator
+                const loadingMessage = document.createElement('div');
+                loadingMessage.className = 'bot-message';
+                loadingMessage.id = 'loading-message';
+                loadingMessage.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Thinking...</p>';
+                messagesContainer.appendChild(loadingMessage);
+                
+                input.value = '';
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Send message to AI chatbot
+                fetch('/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove loading indicator
+                    const loading = document.getElementById('loading-message');
+                    if (loading) {
+                        loading.remove();
+                    }
+                    
+                    // Add AI response
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'bot-message';
+                    const responseText = data.response || data.error || 'Sorry, I could not process your request.';
+                    botMessage.innerHTML = '<p>' + responseText.replace(/\n/g, '<br>') + '</p>';
+                    messagesContainer.appendChild(botMessage);
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                })
+                .catch(error => {
+                    console.error('Chatbot Error:', error);
+                    
+                    // Remove loading indicator
+                    const loading = document.getElementById('loading-message');
+                    if (loading) {
+                        loading.remove();
+                    }
+                    
+                    // Add error message
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'bot-message';
+                    botMessage.innerHTML = '<p>I\'m having trouble right now. For immediate assistance, please contact us on WhatsApp: <a href="https://wa.me/27633941909" target="_blank">+27 63 394 1909</a></p>';
+                    messagesContainer.appendChild(botMessage);
+                    
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                });
+            }
+        }
+
+        function handleChatbotEnter(event) {
+            if (event.key === 'Enter') {
+                sendChatbotMessage();
+            }
+        }
     </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CV Master</h3>
+                <p>AI-Powered ATS Resume Scanner & CV Builder</p>
+            </div>
+            <div class="footer-section">
+                <h4>Services</h4>
+                <ul>
+                    <li>ATS Resume Scanning</li>
+                    <li>AI CV Optimization</li>
+                    <li>Resume Builder</li>
+                    <li>Career Guidance</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <p><i class="fab fa-whatsapp"></i> WhatsApp: +27 63 394 1909</p>
+                <p><i class="fas fa-envelope"></i> Email: support@cvmaster.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CV Master. Built with ❤️ by <strong>InnoWave620</strong>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Chatbot -->
+    <div id="chatbot-container" class="chatbot-container">
+        <div id="chatbot-toggle" class="chatbot-toggle" onclick="toggleChatbot()">
+            <i class="fas fa-comments"></i>
+        </div>
+        <div id="chatbot-window" class="chatbot-window">
+            <div class="chatbot-header">
+                <h4><i class="fas fa-robot"></i> CV Master Assistant</h4>
+                <button onclick="toggleChatbot()" class="chatbot-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="bot-message">
+                    <p>👋 Hi! I'm your CV Master assistant. I can help you with:</p>
+                    <ul>
+                        <li>How to use our ATS scanner</li>
+                        <li>CV optimization tips</li>
+                        <li>Service information</li>
+                        <li>Technical support</li>
+                    </ul>
+                    <p>For direct support, contact us on WhatsApp: <a href="https://wa.me/27633941909" target="_blank">+27 63 394 1909</a></p>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-message" placeholder="Ask me anything..." onkeypress="handleChatbotEnter(event)">
+                <button onclick="sendChatbotMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

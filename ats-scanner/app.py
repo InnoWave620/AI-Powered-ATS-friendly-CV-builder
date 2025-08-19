@@ -419,6 +419,261 @@ def payment_notify():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
+@app.route('/download-optimized-cv', methods=['POST'])
+def download_optimized_cv():
+    """Download optimized CV as PDF"""
+    try:
+        data = request.get_json()
+        content = data.get('content', '')
+        
+        if not content:
+            return jsonify({'error': 'No content provided'}), 400
+        
+        # Generate PDF
+        filename = f"optimized_cv_{uuid.uuid4().hex[:8]}.pdf"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        doc = SimpleDocTemplate(filepath, pagesize=A4)
+        styles = getSampleStyleSheet()
+        story = []
+        
+        # Split content into paragraphs and add to PDF
+        paragraphs = content.split('\n\n')
+        for para in paragraphs:
+            if para.strip():
+                p = Paragraph(para.strip(), styles['Normal'])
+                story.append(p)
+                story.append(Spacer(1, 12))
+        
+        doc.build(story)
+        
+        return send_file(filepath, as_attachment=True, download_name=filename)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/chatbot', methods=['POST'])
+def chatbot_response():
+    """Handle chatbot messages with AI responses"""
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '').strip()
+        
+        if not user_message:
+            return jsonify({'error': 'No message provided'}), 400
+        
+        # Generate AI response using Groq
+        client = get_groq_client()
+        if not client:
+            return jsonify({
+                'response': "I'm currently experiencing technical difficulties. For immediate assistance, please contact us on WhatsApp: +27 63 394 1909"
+            })
+        
+        # Create a context-aware prompt for the chatbot
+        system_prompt = """
+You are CV Master Assistant, a helpful AI chatbot for a CV and resume optimization service called CV Master, built by InnoWave620. 
+
+Your services include:
+1. ATS Resume Scanning - Analyze resumes for ATS compatibility and provide scores
+2. AI CV Optimization - Improve resumes using AI suggestions
+3. Resume Builder - Create professional resumes from scratch
+4. Career Guidance - Provide career advice and tips
+
+You should:
+- Be helpful, professional, and friendly
+- Provide clear instructions on how to use the website
+- Answer questions about CV optimization, ATS systems, and career advice
+- For technical issues or detailed support, direct users to WhatsApp: +27 63 394 1909
+- Keep responses concise but informative
+- Always maintain a professional tone
+
+If asked about pricing, mention that services cost R25 each.
+If asked about the company, mention it's built by InnoWave620.
+"""
+        
+        try:
+            completion = client.chat.completions.create(
+                model=LLAMA_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ],
+                temperature=0.7,
+                max_tokens=500,
+                top_p=1,
+            )
+            
+            ai_response = completion.choices[0].message.content.strip()
+            
+            # Add WhatsApp contact for complex queries
+            if any(keyword in user_message.lower() for keyword in ['help', 'support', 'problem', 'issue', 'error', 'contact']):
+                ai_response += "\n\nFor additional support, feel free to contact us on WhatsApp: +27 63 394 1909"
+            
+            return jsonify({'response': ai_response})
+            
+        except Exception as e:
+            return jsonify({
+                'response': f"I'm having trouble processing your request right now. For immediate assistance, please contact us on WhatsApp: +27 63 394 1909"
+            })
+        
+    except Exception as e:
+        return jsonify({'error': 'Failed to process message'}), 500
+
+@app.route('/ai-assist', methods=['POST'])
+def ai_assist():
+    """Provide AI assistance for CV form fields"""
+    try:
+        data = request.get_json()
+        field_type = data.get('fieldType', '')
+        current_text = data.get('currentText', '')
+        job_description = data.get('jobDescription', '')
+        first_name = data.get('firstName', '')
+        last_name = data.get('lastName', '')
+        professional_summary = data.get('professionalSummary', '')
+        
+        if not field_type:
+            return jsonify({'error': 'Field type is required'}), 400
+        
+        # Generate AI assistance using Groq
+        client = get_groq_client()
+        if not client:
+            return jsonify({
+                'success': False,
+                'error': 'AI assistance is temporarily unavailable. Please try again later.'
+            }), 503
+        
+        # Create context-aware prompts based on field type
+        prompts = {
+            'professional_summary': f"""
+Create a compelling professional summary for {first_name} {last_name}.
+
+Context:
+- Current text: {current_text}
+- Target job: {job_description[:500] if job_description else 'General professional role'}
+
+Write a 2-3 sentence professional summary that:
+- Highlights key strengths and experience
+- Aligns with the target job requirements
+- Uses action-oriented language
+- Is ATS-friendly with relevant keywords
+
+Keep it concise, impactful, and professional.
+""",
+            
+            'job_description': f"""
+Enhance this job description with quantified achievements and impact-focused language.
+
+Current text: {current_text}
+Target job requirements: {job_description[:500] if job_description else 'Professional role'}
+
+Improve the description by:
+- Adding specific metrics and achievements where possible
+- Using strong action verbs
+- Highlighting relevant skills and technologies
+- Making it ATS-friendly with keywords from the job posting
+- Focusing on results and impact
+
+Provide 3-5 bullet points that showcase accomplishments and responsibilities.
+""",
+            
+            'technical_skills': f"""
+Suggest relevant technical skills based on the target job.
+
+Current skills: {current_text}
+Target job: {job_description[:500] if job_description else 'Technical role'}
+
+Provide a comprehensive list of technical skills that:
+- Matches the job requirements
+- Includes both hard and soft technical skills
+- Uses industry-standard terminology
+- Is formatted for ATS scanning
+
+Format as a comma-separated list of skills.
+""",
+            
+            'soft_skills': f"""
+Suggest relevant soft skills for this professional profile.
+
+Current skills: {current_text}
+Target job: {job_description[:500] if job_description else 'Professional role'}
+Professional background: {professional_summary}
+
+Provide soft skills that:
+- Complement the technical requirements
+- Are relevant to the target role
+- Demonstrate leadership and collaboration
+- Are valued by employers
+
+Format as a comma-separated list.
+""",
+            
+            'languages': f"""
+Suggest language skills formatting and additional languages that might be valuable.
+
+Current languages: {current_text}
+Target job: {job_description[:500] if job_description else 'Professional role'}
+
+Provide language skills that:
+- Follow professional formatting (Language - Proficiency Level)
+- Include relevant languages for the target market
+- Use standard proficiency levels (Native, Fluent, Intermediate, Basic)
+
+Example format: English (Native), Spanish (Fluent), French (Intermediate)
+""",
+            
+            'certifications': f"""
+Suggest relevant certifications and professional achievements.
+
+Current certifications: {current_text}
+Target job: {job_description[:500] if job_description else 'Professional role'}
+
+Suggest certifications that:
+- Are relevant to the target industry/role
+- Add credibility to the professional profile
+- Include both completed and recommended certifications
+- Follow proper formatting with dates where applicable
+
+Provide specific certification names and issuing organizations.
+"""
+        }
+        
+        prompt = prompts.get(field_type, f"""
+Improve this {field_type} section for a professional CV.
+
+Current text: {current_text}
+Target job: {job_description[:500] if job_description else 'Professional role'}
+
+Enhance the content to be more professional, impactful, and ATS-friendly.
+""")
+        
+        try:
+            completion = client.chat.completions.create(
+                model=LLAMA_MODEL,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.7,
+                max_tokens=800,
+                top_p=1,
+            )
+            
+            suggestion = completion.choices[0].message.content.strip()
+            
+            return jsonify({
+                'success': True,
+                'suggestion': suggestion
+            })
+            
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'error': f'Failed to generate AI assistance: {str(e)}'
+            }), 500
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Failed to process AI assistance request'
+        }), 500
+
 @app.route('/download/<int:report_id>')
 @login_required
 def download(report_id):

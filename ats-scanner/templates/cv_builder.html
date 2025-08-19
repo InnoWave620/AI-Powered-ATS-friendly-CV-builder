@@ -427,6 +427,108 @@
             color: #48bb78;
         }
 
+        /* AI Assistant Styles */
+        .ai-assist-container {
+            position: relative;
+        }
+
+        .ai-assist-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+        }
+
+        .ai-assist-btn:hover {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .ai-assist-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ai-assist-btn .spinner {
+            width: 12px;
+            height: 12px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .ai-suggestions {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .ai-suggestions.show {
+            display: block;
+        }
+
+        .ai-suggestions h4 {
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .ai-suggestions p {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-suggestions-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .ai-suggestions-actions button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .accept-suggestion {
+            background: #48bb78;
+            color: white;
+        }
+
+        .accept-suggestion:hover {
+            background: #38a169;
+        }
+
+        .reject-suggestion {
+            background: #666;
+            color: white;
+        }
+
+        .reject-suggestion:hover {
+            background: #555;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .nav-links {
@@ -563,9 +665,13 @@
                             </div>
                         </div>
                         
-                        <div class="form-group">
+                        <div class="form-group ai-assist-container">
                             <label for="professionalSummary" class="form-label">Professional Summary</label>
                             <textarea name="professional_summary" id="professionalSummary" class="form-textarea" placeholder="Brief overview of your professional background and career objectives..."></textarea>
+                            <button type="button" class="ai-assist-btn" onclick="getAIAssistance('professionalSummary', 'professional_summary')">
+                                <i class="fas fa-magic"></i> AI Assist
+                            </button>
+                            <div class="ai-suggestions" id="professionalSummary-suggestions"></div>
                         </div>
                     </div>
 
@@ -603,9 +709,13 @@
                                     </div>
                                 </div>
                                 
-                                <div class="form-group">
+                                <div class="form-group ai-assist-container">
                                     <label class="form-label">Job Description & Achievements</label>
                                     <textarea name="experience[0][description]" class="form-textarea" placeholder="Describe your responsibilities and key achievements in this role..."></textarea>
+                                    <button type="button" class="ai-assist-btn" onclick="getAIAssistance('experience[0][description]', 'job_description')">
+                                        <i class="fas fa-magic"></i> AI Assist
+                                    </button>
+                                    <div class="ai-suggestions" id="experience[0][description]-suggestions"></div>
                                 </div>
                             </div>
                         </div>
@@ -668,21 +778,37 @@
                         </h2>
                         
                         <div class="form-grid">
-                            <div class="form-group">
+                            <div class="form-group ai-assist-container">
                                 <label for="technicalSkills" class="form-label">Technical Skills</label>
                                 <textarea name="technical_skills" id="technicalSkills" class="form-textarea" placeholder="Programming languages, software, tools, technologies..."></textarea>
+                                <button type="button" class="ai-assist-btn" onclick="getAIAssistance('technicalSkills', 'technical_skills')">
+                                    <i class="fas fa-magic"></i> AI Assist
+                                </button>
+                                <div class="ai-suggestions" id="technicalSkills-suggestions"></div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group ai-assist-container">
                                 <label for="softSkills" class="form-label">Soft Skills</label>
                                 <textarea name="soft_skills" id="softSkills" class="form-textarea" placeholder="Communication, leadership, problem-solving, teamwork..."></textarea>
+                                <button type="button" class="ai-assist-btn" onclick="getAIAssistance('softSkills', 'soft_skills')">
+                                    <i class="fas fa-magic"></i> AI Assist
+                                </button>
+                                <div class="ai-suggestions" id="softSkills-suggestions"></div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group ai-assist-container">
                                 <label for="languages" class="form-label">Languages</label>
                                 <textarea name="languages" id="languages" class="form-textarea" placeholder="English (Native), Spanish (Fluent), French (Intermediate)..."></textarea>
+                                <button type="button" class="ai-assist-btn" onclick="getAIAssistance('languages', 'languages')">
+                                    <i class="fas fa-magic"></i> AI Assist
+                                </button>
+                                <div class="ai-suggestions" id="languages-suggestions"></div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group ai-assist-container">
                                 <label for="certifications" class="form-label">Certifications</label>
                                 <textarea name="certifications" id="certifications" class="form-textarea" placeholder="Professional certifications, licenses, awards..."></textarea>
+                                <button type="button" class="ai-assist-btn" onclick="getAIAssistance('certifications', 'certifications')">
+                                    <i class="fas fa-magic"></i> AI Assist
+                                </button>
+                                <div class="ai-suggestions" id="certifications-suggestions"></div>
                             </div>
                         </div>
                     </div>
@@ -869,9 +995,13 @@
                     </div>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group ai-assist-container">
                     <label class="form-label">Job Description & Achievements</label>
                     <textarea name="experience[${index}][description]" class="form-textarea" placeholder="Describe your responsibilities and key achievements in this role..."></textarea>
+                    <button type="button" class="ai-assist-btn" onclick="getAIAssistance('experience[${index}][description]', 'job_description')">
+                        <i class="fas fa-magic"></i> AI Assist
+                    </button>
+                    <div class="ai-suggestions" id="experience[${index}][description]-suggestions"></div>
                 </div>
             `;
             
@@ -984,6 +1114,99 @@
         // Initialize remove button visibility
         updateRemoveButtons('experience');
         updateRemoveButtons('education');
+
+        // AI Assistance Functions
+        async function getAIAssistance(fieldId, fieldType) {
+            const textarea = document.querySelector(`[name="${fieldId}"], #${fieldId}`);
+            const button = document.querySelector(`button[onclick*="${fieldId}"]`);
+            const suggestionsDiv = document.getElementById(`${fieldId}-suggestions`);
+            
+            if (!textarea) {
+                console.error('Textarea not found for field:', fieldId);
+                return;
+            }
+
+            const currentText = textarea.value.trim();
+            const jobDescription = document.getElementById('jobDescription')?.value || '';
+            
+            // Get context from other form fields
+            const context = {
+                firstName: document.getElementById('firstName')?.value || '',
+                lastName: document.getElementById('lastName')?.value || '',
+                professionalSummary: document.getElementById('professionalSummary')?.value || '',
+                jobDescription: jobDescription,
+                fieldType: fieldType,
+                currentText: currentText
+            };
+
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = '<div class="spinner"></div> Generating...';
+            
+            try {
+                const response = await fetch('/ai-assist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(context)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to get AI assistance');
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAISuggestions(fieldId, data.suggestion, textarea);
+                } else {
+                    throw new Error(data.error || 'Unknown error occurred');
+                }
+            } catch (error) {
+                console.error('AI Assistance Error:', error);
+                alert('Sorry, AI assistance is temporarily unavailable. Please try again later.');
+            } finally {
+                // Reset button state
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-magic"></i> AI Assist';
+            }
+        }
+
+        function showAISuggestions(fieldId, suggestion, textarea) {
+            const suggestionsDiv = document.getElementById(`${fieldId}-suggestions`);
+            
+            suggestionsDiv.innerHTML = `
+                <h4><i class="fas fa-lightbulb"></i> AI Suggestion</h4>
+                <p>${suggestion}</p>
+                <div class="ai-suggestions-actions">
+                    <button class="accept-suggestion" onclick="acceptSuggestion('${fieldId}', \`${suggestion.replace(/`/g, '\\`')}\`)">
+                        <i class="fas fa-check"></i> Use This
+                    </button>
+                    <button class="reject-suggestion" onclick="hideSuggestions('${fieldId}')">
+                        <i class="fas fa-times"></i> Dismiss
+                    </button>
+                </div>
+            `;
+            
+            suggestionsDiv.classList.add('show');
+        }
+
+        function acceptSuggestion(fieldId, suggestion) {
+            const textarea = document.querySelector(`[name="${fieldId}"], #${fieldId}`);
+            if (textarea) {
+                textarea.value = suggestion;
+                textarea.focus();
+            }
+            hideSuggestions(fieldId);
+        }
+
+        function hideSuggestions(fieldId) {
+            const suggestionsDiv = document.getElementById(`${fieldId}-suggestions`);
+            if (suggestionsDiv) {
+                suggestionsDiv.classList.remove('show');
+            }
+        }
     </script>
 </body>
 </html>
