@@ -262,11 +262,22 @@
             margin-bottom: 1.5rem;
         }
 
+        .score-text {
+            margin: 1rem 0;
+        }
+
+        .score-text h3 {
+            color: #ffd700;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
         .score-circle {
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: conic-gradient(#ffd700 0deg, #ffd700 {{ (ats_score or 0) * 3.6 }}deg, rgba(255, 215, 0, 0.2) {{ (ats_score or 0) * 3.6 }}deg);
+            background: conic-gradient(#ffd700 0deg, #ffd700 {{ (ats_score or 0) * 3.6 }}deg, rgba(255, 215, 0, 0.2) {{ (ats_score or 0) * 3.6 }}deg, rgba(255, 215, 0, 0.2) 360deg);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -365,6 +376,22 @@
             background: rgba(72, 187, 120, 0.1);
             border: 1px solid rgba(72, 187, 120, 0.3);
             color: #48bb78;
+        }
+
+        /* Pulse Animation for ATS-Guaranteed CV Button */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(255, 215, 0, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+            }
         }
 
         /* Responsive */
@@ -475,40 +502,51 @@
                     </div>
 
                     {% if service_type == 'scan' and ats_score %}
-                        <!-- ATS Score Display -->
+                        <!-- Enhanced ATS Score Display -->
                         <div class="ats-score">
                             <div class="score-header">
                                 <i class="fas fa-chart-line"></i>
-                                <h4>Your ATS Compatibility Score</h4>
+                                <h4>ATS Compatibility Analysis</h4>
                             </div>
                             <div class="score-display">
                                 <div class="score-circle">
                                     <div class="score-value">{{ ats_score }}%</div>
                                 </div>
+                                <div class="score-text">
+                                    <h2 style="color: #ffd700; margin: 1rem 0; font-size: 2rem; text-align: center;">
+                                        <i class="fas fa-chart-line"></i> Your ATS Score is {{ ats_score }}%
+                                    </h2>
+                                </div>
                                 <div class="score-label">
                                     {% if ats_score >= 80 %}
-                                        Excellent ATS Compatibility
+                                        <span style="color: #48bb78; font-weight: bold;">Excellent ATS Compatibility</span>
                                     {% elif ats_score >= 60 %}
-                                        Good ATS Compatibility
+                                        <span style="color: #ffc107; font-weight: bold;">Good ATS Compatibility</span>
                                     {% elif ats_score >= 40 %}
-                                        Fair ATS Compatibility
+                                        <span style="color: #ff9800; font-weight: bold;">Fair ATS Compatibility</span>
                                     {% else %}
-                                        Needs Improvement
+                                        <span style="color: #ff6b6b; font-weight: bold;">Poor ATS Score - Needs Improvement</span>
                                     {% endif %}
                                 </div>
+                                {% if ats_score < 80 %}
+                                    <div class="score-recommendation" style="margin-top: 1rem; padding: 1rem; background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 10px; color: #ff6b6b;">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <strong>Recommendation:</strong> Your ATS score is below 80%. Consider generating an ATS-guaranteed CV for better job application success.
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     {% endif %}
 
                     <!-- Download Options -->
                     <div class="download-options">
-                        <div class="download-option">
-                            <i class="fas fa-file-pdf"></i>
-                            <h4>Download PDF</h4>
-                            <p>Get your {% if service_type == 'scan' %}optimized CV and analysis report{% else %}custom CV{% endif %} in PDF format</p>
-                            <a href="{{ url_for('download_pdf', report_id=report_id) }}" class="download-btn">
+                        <div class="download-option" {% if service_type == 'scan' %}style="border: 2px solid #4CAF50; background: rgba(76, 175, 80, 0.1);"{% endif %}>
+                            <i class="fas fa-file-pdf" {% if service_type == 'scan' %}style="color: #4CAF50;"{% endif %}></i>
+                            <h4 {% if service_type == 'scan' %}style="color: #4CAF50;"{% endif %}>{% if service_type == 'scan' %}Download Scan Report{% else %}Download PDF{% endif %}</h4>
+                            <p>Get your {% if service_type == 'scan' %}detailed ATS compatibility analysis report{% else %}custom CV{% endif %} in PDF format</p>
+                            <a href="{{ url_for('download_file', report_id=report_id) }}" class="download-btn" {% if service_type == 'scan' %}style="background: linear-gradient(45deg, #4CAF50, #66BB6A);"{% endif %}>
                                 <i class="fas fa-download"></i>
-                                Download PDF
+                                {% if service_type == 'scan' %}Download Scan Report{% else %}Download PDF{% endif %}
                             </a>
                         </div>
 
@@ -534,6 +572,18 @@
                                     View Suggestions
                                 </a>
                             </div>
+                            
+                            {% if ats_score < 80 %}
+                                <div class="download-option" style="border: 3px solid #ff6b35; background: rgba(255, 107, 53, 0.1); box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);">
+                                    <i class="fas fa-rocket" style="color: #ff6b35; font-size: 2rem;"></i>
+                                    <h4 style="color: #ff6b35; font-size: 1.5rem; margin: 1rem 0;">Get an ATS Compliant CV</h4>
+                                    <p style="font-size: 1.1rem; margin: 1rem 0;">Build a new CV using your previous CV information but optimized for 80%+ ATS score</p>
+                                    <a href="{{ url_for('generate_ats_guaranteed_cv', report_id=report_id) }}" class="download-btn" style="background: linear-gradient(45deg, #ff6b35, #ff8a50); animation: pulse 2s infinite; font-size: 1.2rem; padding: 1rem 2rem;">
+                                        <i class="fas fa-magic"></i>
+                                        Get ATS Compliant CV
+                                    </a>
+                                </div>
+                            {% endif %}
                         {% endif %}
                     </div>
 
