@@ -479,6 +479,8 @@
                         <div class="service-icon">
                             {% if service_type == 'scan' %}
                                 <i class="fas fa-search"></i>
+                            {% elif service_type == 'ats_compliant' %}
+                                <i class="fas fa-rocket"></i>
                             {% else %}
                                 <i class="fas fa-hammer"></i>
                             {% endif %}
@@ -487,6 +489,8 @@
                             <h3>
                                 {% if service_type == 'scan' %}
                                     ATS CV Analysis Complete
+                                {% elif service_type == 'ats_compliant' %}
+                                    ATS Compliant CV Generated
                                 {% else %}
                                     Custom CV Generated
                                 {% endif %}
@@ -494,6 +498,8 @@
                             <p>
                                 {% if service_type == 'scan' %}
                                     Your CV has been analyzed and optimized for ATS compatibility
+                                {% elif service_type == 'ats_compliant' %}
+                                    Your CV has been completely optimized for maximum ATS compatibility
                                 {% else %}
                                     Your professional CV has been created and tailored to your target job
                                 {% endif %}
@@ -501,12 +507,12 @@
                         </div>
                     </div>
 
-                    {% if service_type == 'scan' and ats_score %}
+                    {% if ats_score %}
                         <!-- Enhanced ATS Score Display -->
                         <div class="ats-score">
                             <div class="score-header">
                                 <i class="fas fa-chart-line"></i>
-                                <h4>ATS Compatibility Analysis</h4>
+                                <h4>{% if service_type == 'scan' %}ATS Compatibility Analysis{% else %}New ATS Score{% endif %}</h4>
                             </div>
                             <div class="score-display">
                                 <div class="score-circle">
@@ -514,7 +520,7 @@
                                 </div>
                                 <div class="score-text">
                                     <h2 style="color: #ffd700; margin: 1rem 0; font-size: 2rem; text-align: center;">
-                                        <i class="fas fa-chart-line"></i> Your ATS Score is {{ ats_score }}%
+                                        <i class="fas fa-chart-line"></i> {% if service_type == 'scan' %}Your ATS Score is {{ ats_score }}%{% else %}Your New ATS Score is {{ ats_score }}%{% endif %}
                                     </h2>
                                 </div>
                                 <div class="score-label">
@@ -528,10 +534,15 @@
                                         <span style="color: #ff6b6b; font-weight: bold;">Poor ATS Score - Needs Improvement</span>
                                     {% endif %}
                                 </div>
-                                {% if ats_score < 80 %}
+                                {% if service_type == 'scan' and ats_score < 80 %}
                                     <div class="score-recommendation" style="margin-top: 1rem; padding: 1rem; background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 10px; color: #ff6b6b;">
                                         <i class="fas fa-exclamation-triangle"></i>
                                         <strong>Recommendation:</strong> Your ATS score is below 80%. Consider generating an ATS-guaranteed CV for better job application success.
+                                    </div>
+                                {% elif service_type != 'scan' and ats_score >= 80 %}
+                                    <div class="score-recommendation" style="margin-top: 1rem; padding: 1rem; background: rgba(72, 187, 120, 0.1); border: 1px solid rgba(72, 187, 120, 0.3); border-radius: 10px; color: #48bb78;">
+                                        <i class="fas fa-check-circle"></i>
+                                        <strong>Success!</strong> Your ATS-optimized CV now has an excellent score of {{ ats_score }}% and is ready for job applications.
                                     </div>
                                 {% endif %}
                             </div>
@@ -540,13 +551,27 @@
 
                     <!-- Download Options -->
                     <div class="download-options">
-                        <div class="download-option" {% if service_type == 'scan' %}style="border: 2px solid #4CAF50; background: rgba(76, 175, 80, 0.1);"{% endif %}>
-                            <i class="fas fa-file-pdf" {% if service_type == 'scan' %}style="color: #4CAF50;"{% endif %}></i>
-                            <h4 {% if service_type == 'scan' %}style="color: #4CAF50;"{% endif %}>{% if service_type == 'scan' %}Download Scan Report{% else %}Download PDF{% endif %}</h4>
-                            <p>Get your {% if service_type == 'scan' %}detailed ATS compatibility analysis report{% else %}custom CV{% endif %} in PDF format</p>
-                            <a href="{{ url_for('download_file', report_id=report_id) }}" class="download-btn" {% if service_type == 'scan' %}style="background: linear-gradient(45deg, #4CAF50, #66BB6A);"{% endif %}>
+                        <div class="download-option" {% if service_type == 'scan' %}style="border: 2px solid #4CAF50; background: rgba(76, 175, 80, 0.1);"{% elif service_type == 'ats_compliant' %}style="border: 2px solid #ff6b35; background: rgba(255, 107, 53, 0.1);"{% endif %}>
+                            <i class="fas fa-file-pdf" {% if service_type == 'scan' %}style="color: #4CAF50;"{% elif service_type == 'ats_compliant' %}style="color: #ff6b35;"{% endif %}></i>
+                            <h4 {% if service_type == 'scan' %}style="color: #4CAF50;"{% elif service_type == 'ats_compliant' %}style="color: #ff6b35;"{% endif %}>
+                                {% if service_type == 'scan' %}
+                                    Download Scan Report
+                                {% elif service_type == 'ats_compliant' %}
+                                    Download ATS Compliant CV
+                                {% else %}
+                                    Download PDF
+                                {% endif %}
+                            </h4>
+                            <p>Get your {% if service_type == 'scan' %}detailed ATS compatibility analysis report{% elif service_type == 'ats_compliant' %}ATS-optimized CV with {{ ats_score }}% score{% else %}custom CV{% endif %} in PDF format</p>
+                            <a href="{{ url_for('download_pdf', report_id=report.id) }}" class="download-btn" {% if service_type == 'scan' %}style="background: linear-gradient(45deg, #4CAF50, #66BB6A);"{% elif service_type == 'ats_compliant' %}style="background: linear-gradient(45deg, #ff6b35, #ff8a50);"{% endif %}>
                                 <i class="fas fa-download"></i>
-                                {% if service_type == 'scan' %}Download Scan Report{% else %}Download PDF{% endif %}
+                                {% if service_type == 'scan' %}
+                                    Download Scan Report
+                                {% elif service_type == 'ats_compliant' %}
+                                    Download ATS Compliant CV
+                                {% else %}
+                                    Download PDF
+                                {% endif %}
                             </a>
                         </div>
 

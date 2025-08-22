@@ -398,13 +398,13 @@
                         <i class="fas fa-search"></i>
                     </div>
                     <h3>ATS Scanning & Enhancement</h3>
-                    <p>Upload your existing CV and get detailed ATS compatibility analysis with AI-powered improvement suggestions.</p>
-                    <div class="service-price">R35</div>
+                    <p>Analyze your resume against job descriptions and get AI-powered suggestions for improvement.</p>
+                    <div class="service-price">R25</div>
                     <a href="{{ url_for('ats_scan') }}" class="btn-primary">
-                        <i class="fas fa-upload"></i> Scan My CV
+                        <i class="fas fa-search"></i> Scan Resume
                     </a>
                 </div>
-
+                
                 <div class="service-card">
                     <div class="service-icon">
                         <i class="fas fa-hammer"></i>
@@ -430,9 +430,7 @@
                             <div class="report-card">
                                 <div class="report-header">
                                     <div class="report-type">
-                                        {% if report.report_type == 'ats_scan' %}
-                                            <i class="fas fa-search"></i> ATS Scan
-                                        {% elif report.report_type == 'cv_build' %}
+                                        {% if report.report_type == 'cv_build' %}
                                             <i class="fas fa-hammer"></i> CV Build
                                         {% else %}
                                             <i class="fas fa-file"></i> {{ report.report_type.title() }}
@@ -469,13 +467,17 @@
 
                                 <div class="report-actions">
                                     {% if report.is_paid %}
-                                        <a href="{{ url_for('download', report_id=report.id) }}" class="btn-secondary">
-                                            <i class="fas fa-download"></i> Download
-                                        </a>
-                                        {% if report.ai_suggestions %}
-                                            <a href="#" class="btn-secondary" onclick="showSuggestions({{ report.id }})">
+                                        {% if report.report_type == 'scan' %}
+                                            <a href="{{ url_for('download', report_id=report.id) }}" class="btn-primary">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                            <a href="{{ url_for('view_suggestions', report_id=report.id) }}" class="btn-secondary">
                                                 <i class="fas fa-lightbulb"></i> View Suggestions
                                             </a>
+                                        {% else %}
+                                            <span class="btn-secondary" style="background: #28a745; cursor: default;">
+                                                <i class="fas fa-check-circle"></i> Completed
+                                            </span>
                                         {% endif %}
                                     {% else %}
                                         <a href="{{ url_for('payment', service=report.report_type) }}" class="btn-primary">

@@ -43,7 +43,11 @@
             <div class="payment-container" data-aos="fade-up">
                 <div class="payment-header">
                     <div class="service-icon">
-                        <i class="fas fa-{{ 'search' if service == 'ats_scan' else 'file-alt' }}"></i>
+                        {% if service == 'ats_scan' %}
+                            <i class="fas fa-search"></i>
+                        {% else %}
+                            <i class="fas fa-file-alt"></i>
+                        {% endif %}
                     </div>
                     <h1>Complete Your Payment</h1>
                     <p>{{ service.replace('_', ' ').title() }} Service</p>

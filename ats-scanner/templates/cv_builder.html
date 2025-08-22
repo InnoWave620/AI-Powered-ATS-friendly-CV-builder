@@ -1176,18 +1176,35 @@
         function showAISuggestions(fieldId, suggestion, textarea) {
             const suggestionsDiv = document.getElementById(`${fieldId}-suggestions`);
             
-            suggestionsDiv.innerHTML = `
-                <h4><i class="fas fa-lightbulb"></i> AI Suggestion</h4>
-                <p>${suggestion}</p>
-                <div class="ai-suggestions-actions">
-                    <button class="accept-suggestion" onclick="acceptSuggestion('${fieldId}', \`${suggestion.replace(/`/g, '\\`')}\`)">
-                        <i class="fas fa-check"></i> Use This
-                    </button>
-                    <button class="reject-suggestion" onclick="hideSuggestions('${fieldId}')">
-                        <i class="fas fa-times"></i> Dismiss
-                    </button>
-                </div>
-            `;
+            // Clear previous content
+            suggestionsDiv.innerHTML = '';
+            
+            // Create elements safely
+            const title = document.createElement('h4');
+            title.innerHTML = '<i class="fas fa-lightbulb"></i> AI Suggestion';
+            
+            const suggestionText = document.createElement('p');
+            suggestionText.textContent = suggestion;
+            
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'ai-suggestions-actions';
+            
+            const acceptBtn = document.createElement('button');
+            acceptBtn.className = 'accept-suggestion';
+            acceptBtn.innerHTML = '<i class="fas fa-check"></i> Use This';
+            acceptBtn.addEventListener('click', () => acceptSuggestion(fieldId, suggestion));
+            
+            const rejectBtn = document.createElement('button');
+            rejectBtn.className = 'reject-suggestion';
+            rejectBtn.innerHTML = '<i class="fas fa-times"></i> Dismiss';
+            rejectBtn.addEventListener('click', () => hideSuggestions(fieldId));
+            
+            actionsDiv.appendChild(acceptBtn);
+            actionsDiv.appendChild(rejectBtn);
+            
+            suggestionsDiv.appendChild(title);
+            suggestionsDiv.appendChild(suggestionText);
+            suggestionsDiv.appendChild(actionsDiv);
             
             suggestionsDiv.classList.add('show');
         }

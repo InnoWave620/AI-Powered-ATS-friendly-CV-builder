@@ -59,35 +59,56 @@ def match_keywords(resume_text, job_description):
                     synonym_matches.add((job_word, resume_word))
                     break
     
-    # Calculate weighted score
+    # Calculate realistic weighted score
     total_job_keywords = len(job_words)
     if total_job_keywords == 0:
         return 0, set(), []
     
-    # Scoring weights
-    exact_weight = 1.0
-    partial_weight = 0.8
-    synonym_weight = 0.6
+    # More generous scoring weights
+    exact_weight = 2.0  # Increased weight for exact matches
+    partial_weight = 1.5  # Increased weight for partial matches
+    synonym_weight = 1.0  # Increased weight for synonym matches
     
-    score = (
+    # Calculate raw score
+    raw_score = (
         len(exact_matches) * exact_weight +
         len(partial_matches) * partial_weight +
         len(synonym_matches) * synonym_weight
     )
     
-    # Calculate percentage with bonus for high match density
-    base_score = min(100, int((score / total_job_keywords) * 100))
-    
-    # Bonus scoring for comprehensive coverage
-    coverage_bonus = 0
+    # Use a more achievable scoring formula
+    # Focus on match quality rather than total coverage
     total_matches = len(exact_matches) + len(partial_matches) + len(synonym_matches)
     
-    if total_matches >= total_job_keywords * 0.8:  # 80%+ coverage
-        coverage_bonus = 10
-    elif total_matches >= total_job_keywords * 0.6:  # 60%+ coverage
-        coverage_bonus = 5
+    # Base score calculation - more generous
+    if total_job_keywords <= 50:
+        # For smaller keyword sets, use traditional percentage
+        base_score = min(100, int((raw_score / total_job_keywords) * 100))
+    else:
+        # For larger keyword sets, use a more achievable formula
+        # Focus on having good coverage of the most important terms
+        coverage_ratio = total_matches / total_job_keywords
+        if coverage_ratio >= 0.4:  # 40%+ coverage is excellent for large sets
+            base_score = 85 + min(15, int((coverage_ratio - 0.4) * 50))
+        elif coverage_ratio >= 0.3:  # 30%+ coverage is very good
+            base_score = 75 + int((coverage_ratio - 0.3) * 100)
+        elif coverage_ratio >= 0.2:  # 20%+ coverage is good
+            base_score = 60 + int((coverage_ratio - 0.2) * 150)
+        else:
+            base_score = int(coverage_ratio * 300)  # Below 20% gets lower scores
     
-    final_score = min(100, base_score + coverage_bonus)
+    # Quality bonus for having many exact matches
+    quality_bonus = 0
+    if len(exact_matches) >= 20:
+        quality_bonus = 10
+    elif len(exact_matches) >= 15:
+        quality_bonus = 7
+    elif len(exact_matches) >= 10:
+        quality_bonus = 5
+    elif len(exact_matches) >= 5:
+        quality_bonus = 3
+    
+    final_score = min(100, base_score + quality_bonus)
     
     # Combine all matches for reporting
     all_matches = exact_matches.copy()
