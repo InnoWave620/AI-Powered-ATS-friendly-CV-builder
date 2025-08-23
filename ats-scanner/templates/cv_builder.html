@@ -631,7 +631,7 @@
 
             <!-- Form Container -->
             <div class="form-container" data-aos="fade-up" data-aos-delay="200">
-                <form id="cvBuilderForm" method="POST">
+                <form id="cvBuilderForm" method="POST" novalidate>
                     <!-- Step 1: Personal Information -->
                     <div class="form-section active" data-step="1">
                         <h2 class="section-title">
@@ -945,6 +945,13 @@
             return true;
         }
 
+        function showStep(stepNumber) {
+            if (stepNumber >= 1 && stepNumber <= totalSteps) {
+                currentStep = stepNumber;
+                updateStep();
+            }
+        }
+
         // Dynamic sections
         function addExperience() {
             const container = document.getElementById('experienceContainer');
@@ -1072,11 +1079,33 @@
             });
         }
 
+        // Validate all form steps
+        function validateAllSteps() {
+            const allSections = document.querySelectorAll('.form-section');
+            
+            for (let section of allSections) {
+                const requiredFields = section.querySelectorAll('[required]');
+                
+                for (let field of requiredFields) {
+                    if (!field.value.trim()) {
+                        // Show the section with the invalid field
+                        const stepNumber = parseInt(section.getAttribute('data-step'));
+                        showStep(stepNumber);
+                        field.focus();
+                        alert(`Please fill in all required fields in Step ${stepNumber} before submitting.`);
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
         // Form submission
         document.getElementById('cvBuilderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            if (!validateCurrentStep()) {
+            if (!validateAllSteps()) {
                 return;
             }
 
@@ -1084,23 +1113,105 @@
             document.querySelector('.form-container').style.display = 'none';
             document.getElementById('loadingState').classList.add('show');
             
-            // Submit form
+            // Collect and structure form data
             const formData = new FormData(this);
+            const rawData = {};
             
+            // Convert FormData to object
+            for (let [key, value] of formData.entries()) {
+                if (rawData[key]) {
+                    // Handle multiple values (arrays)
+                    if (Array.isArray(rawData[key])) {
+                        rawData[key].push(value);
+                    } else {
+                        rawData[key] = [rawData[key], value];
+                    }
+                } else {
+                    rawData[key] = value;
+                }
+            }
+            
+            // Structure data according to backend expectations
+            const jsonData = {
+                personal_info: {
+                    first_name: rawData.first_name || '',
+                    last_name: rawData.last_name || '',
+                    email: rawData.email || '',
+                    phone: rawData.phone || '',
+                    address: rawData.address || '',
+                    linkedin: rawData.linkedin || '',
+                    professional_summary: rawData.professional_summary || ''
+                },
+                experience: [],
+                education: [],
+                skills: {
+                    technical_skills: rawData.technical_skills || '',
+                    soft_skills: rawData.soft_skills || '',
+                    languages: rawData.languages || '',
+                    certifications: rawData.certifications || ''
+                },
+                job_description: rawData.job_description || ''
+            };
+            
+            // Process experience entries
+            let expIndex = 0;
+            while (rawData[`experience[${expIndex}][title]`]) {
+                jsonData.experience.push({
+                    job_title: rawData[`experience[${expIndex}][title]`] || '',
+                    company: rawData[`experience[${expIndex}][company]`] || '',
+                    start_date: rawData[`experience[${expIndex}][start_date]`] || '',
+                    end_date: rawData[`experience[${expIndex}][end_date]`] || '',
+                    description: rawData[`experience[${expIndex}][description]`] || ''
+                });
+                expIndex++;
+            }
+            
+            // Process education entries
+            let eduIndex = 0;
+            while (rawData[`education[${eduIndex}][degree]`]) {
+                jsonData.education.push({
+                    degree: rawData[`education[${eduIndex}][degree]`] || '',
+                    institution: rawData[`education[${eduIndex}][institution]`] || '',
+                    start_date: rawData[`education[${eduIndex}][start_year]`] || '',
+                    end_date: rawData[`education[${eduIndex}][end_year]`] || '',
+                    description: rawData[`education[${eduIndex}][details]`] || ''
+                });
+                eduIndex++;
+            }
+            
+            // Submit form as JSON
             fetch(this.action || window.location.pathname, {
                 method: 'POST',
-                body: formData
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jsonData)
             })
             .then(response => {
                 if (response.redirected) {
                     window.location.href = response.url;
-                } else {
-                    return response.text();
+                    return;
                 }
+                return response.json();
             })
-            .then(html => {
-                if (html) {
-                    document.body.innerHTML = html;
+            .then(data => {
+                if (data && data.success) {
+                    // Success - redirect to dashboard or specified URL
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
+                } else if (data && data.error) {
+                    // Error from server
+                    alert('Error: ' + data.error);
+                    document.querySelector('.form-container').style.display = 'block';
+                    document.getElementById('loadingState').classList.remove('show');
+                } else {
+                    // Unexpected response
+                    alert('Unexpected response from server. Please try again.');
+                    document.querySelector('.form-container').style.display = 'block';
+                    document.getElementById('loadingState').classList.remove('show');
                 }
             })
             .catch(error => {
@@ -1117,8 +1228,10 @@
 
         // AI Assistance Functions
         async function getAIAssistance(fieldId, fieldType) {
-            const textarea = document.querySelector(`[name="${fieldId}"], #${fieldId}`);
-            const button = document.querySelector(`button[onclick*="${fieldId}"]`);
+            // Escape square brackets in CSS selectors
+            const escapedFieldId = fieldId.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
+            const textarea = document.querySelector(`[name="${escapedFieldId}"], #${escapedFieldId}`);
+            const button = document.querySelector(`button[onclick*="${escapedFieldId}"]`);
             const suggestionsDiv = document.getElementById(`${fieldId}-suggestions`);
             
             if (!textarea) {
@@ -1210,7 +1323,9 @@
         }
 
         function acceptSuggestion(fieldId, suggestion) {
-            const textarea = document.querySelector(`[name="${fieldId}"], #${fieldId}`);
+            // Escape square brackets in CSS selectors
+            const escapedFieldId = fieldId.replace(/\[/g, '\\[').replace(/\]/g, '\\]');
+            const textarea = document.querySelector(`[name="${escapedFieldId}"], #${escapedFieldId}`);
             if (textarea) {
                 textarea.value = suggestion;
                 textarea.focus();

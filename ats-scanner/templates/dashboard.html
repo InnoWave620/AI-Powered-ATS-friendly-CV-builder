@@ -474,6 +474,13 @@
                                             <a href="{{ url_for('view_suggestions', report_id=report.id) }}" class="btn-secondary">
                                                 <i class="fas fa-lightbulb"></i> View Suggestions
                                             </a>
+                                        {% elif report.report_type == 'cv_build' %}
+                                            <a href="{{ url_for('download_pdf', report_id=report.id) }}" class="btn-primary">
+                                                <i class="fas fa-download"></i> Download PDF
+                                            </a>
+                                            <a href="{{ url_for('download_word', report_id=report.id) }}" class="btn-secondary">
+                                                <i class="fas fa-file-word"></i> Download Word
+                                            </a>
                                         {% else %}
                                             <span class="btn-secondary" style="background: #28a745; cursor: default;">
                                                 <i class="fas fa-check-circle"></i> Completed

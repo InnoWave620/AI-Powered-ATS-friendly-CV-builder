@@ -109,6 +109,7 @@ class CVReport(db.Model):
     job_description = db.Column(db.Text)
     ai_suggestions = db.Column(db.Text)
     generated_cv_path = db.Column(db.String(255))
+    cv_content = db.Column(db.Text)  # Store the generated CV content
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_paid = db.Column(db.Boolean, default=False)
 
@@ -294,6 +295,7 @@ def process_cv_build():
             report_type='cv_build',
             job_description=job_description,
             generated_cv_path=pdf_path,
+            cv_content=cv_content,  # Store the generated CV content
             is_paid=True  # Bypass payment for now
         )
         db.session.add(report)
@@ -306,6 +308,9 @@ def process_cv_build():
         })
         
     except Exception as e:
+        print(f"Error in process_cv_build: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': f'Error generating CV: {str(e)}'
@@ -552,6 +557,10 @@ def ai_assist():
     """Provide AI assistance for CV form fields"""
     try:
         data = request.get_json()
+        if not data:
+            print("ERROR: No JSON data received in ai_assist")
+            return jsonify({'error': 'No data provided'}), 400
+            
         field_type = data.get('fieldType', '')
         current_text = data.get('currentText', '')
         job_description = data.get('jobDescription', '')
@@ -559,12 +568,16 @@ def ai_assist():
         last_name = data.get('lastName', '')
         professional_summary = data.get('professionalSummary', '')
         
+        print(f"AI Assist Request - Field Type: {field_type}, Current Text Length: {len(current_text)}")
+        
         if not field_type:
+            print("ERROR: Field type is required but not provided")
             return jsonify({'error': 'Field type is required'}), 400
         
         # Generate AI assistance using Groq
         client = get_groq_client()
         if not client:
+            print("ERROR: Groq client is not available")
             return jsonify({
                 'success': False,
                 'error': 'AI assistance is temporarily unavailable. Please try again later.'
@@ -579,7 +592,7 @@ Current text: {current_text}
 Target job: {job_description[:500] if job_description else 'General professional role'}
 Name: {first_name} {last_name}
 
-Return ONLY the professional summary text that would appear on a CV. Do not include any introductory phrases, explanations, analysis, or meta-commentary. Just provide the 2-3 sentence professional summary that highlights key strengths, experience, and aligns with the target job requirements.
+Return ONLY the professional summary text that would appear on a CV. Do not include any introductory phrases like 'Here is a professional summary:', titles, headings, explanations, analysis, or meta-commentary. Start directly with the professional summary content - just provide the 2-3 sentence professional summary that highlights key strengths, experience, and aligns with the target job requirements.
 """,
             
             'job_description': f"""
@@ -588,7 +601,7 @@ Improve this job experience description for a CV:
 Current text: {current_text}
 Target job requirements: {job_description[:500] if job_description else 'Professional role'}
 
-Return ONLY the improved job description content that would appear on a CV. Provide 3-5 bullet points with quantified achievements, strong action verbs, and relevant keywords. Do not include any introductory text, explanations, or analysis.
+Return ONLY the improved job description content that would appear directly on a CV. Provide 3-5 bullet points with quantified achievements, strong action verbs, and relevant keywords. Do not include any introductory phrases like 'Here is an improved job experience description:', titles, explanations, analysis, or meta-commentary. Start directly with the bullet points or job description content.
 """,
             
             'technical_skills': f"""
@@ -597,7 +610,7 @@ Provide technical skills for a CV based on:
 Current skills: {current_text}
 Target job: {job_description[:500] if job_description else 'Technical role'}
 
-Return ONLY a comma-separated list of relevant technical skills that would appear on a CV. Do not include any explanations, categories, or additional text.
+Return ONLY a comma-separated list of relevant technical skills that would appear on a CV. Do not include any introductory phrases, titles, headings, explanations, categories, or additional text. Start directly with the skills list.
 """,
             
             'soft_skills': f"""
@@ -607,7 +620,7 @@ Current skills: {current_text}
 Target job: {job_description[:500] if job_description else 'Professional role'}
 Professional background: {professional_summary}
 
-Return ONLY a comma-separated list of relevant soft skills that would appear on a CV. Do not include any explanations, categories, or additional text.
+Return ONLY a comma-separated list of relevant soft skills that would appear on a CV. Do not include any introductory phrases, titles, headings, explanations, categories, or additional text. Start directly with the skills list.
 """,
             
             'languages': f"""
@@ -616,7 +629,7 @@ Provide language skills for a CV based on:
 Current languages: {current_text}
 Target job: {job_description[:500] if job_description else 'Professional role'}
 
-Return ONLY the language skills in proper CV format (Language - Proficiency Level). Use standard proficiency levels: Native, Fluent, Intermediate, Basic. Format example: English (Native), Spanish (Fluent), French (Intermediate). Do not include any explanations or additional text.
+Return ONLY the language skills in proper CV format (Language - Proficiency Level). Use standard proficiency levels: Native, Fluent, Intermediate, Basic. Format example: English (Native), Spanish (Fluent), French (Intermediate). Do not include any introductory phrases, titles, headings, explanations or additional text. Start directly with the language skills list.
 """,
             
             'certifications': f"""
@@ -625,7 +638,7 @@ Provide certifications for a CV based on:
 Current certifications: {current_text}
 Target job: {job_description[:500] if job_description else 'Professional role'}
 
-Return ONLY a list of relevant certifications and professional achievements that would appear on a CV. Include specific certification names and issuing organizations where applicable. Do not include any explanations or additional text.
+Return ONLY a list of relevant certifications and professional achievements that would appear on a CV. Include specific certification names and issuing organizations where applicable. Do not include any introductory phrases, titles, headings, explanations or additional text. Start directly with the certifications list.
 """
         }
         
@@ -635,10 +648,11 @@ Provide improved content for the {field_type} section of a CV.
 Current text: {current_text}
 Target job: {job_description[:500] if job_description else 'Professional role'}
 
-Return ONLY the enhanced content that would appear directly on a CV. Do not include any explanations, meta-commentary, or additional text.
+Return ONLY the enhanced content that would appear directly on a CV. Do not include any introductory phrases, titles, headings, explanations, meta-commentary, or additional text. Start directly with the CV content.
 """)
         
         try:
+            print(f"Making Groq API call for field_type: {field_type}")
             completion = client.chat.completions.create(
                 model=LLAMA_MODEL,
                 messages=[{"role": "user", "content": prompt}],
@@ -648,6 +662,10 @@ Return ONLY the enhanced content that would appear directly on a CV. Do not incl
             )
             
             suggestion = completion.choices[0].message.content.strip()
+            print(f"Groq API call successful, suggestion length: {len(suggestion)}")
+            
+            # Post-process to remove unwanted helper text
+            suggestion = clean_ai_response(suggestion)
             
             return jsonify({
                 'success': True,
@@ -655,12 +673,16 @@ Return ONLY the enhanced content that would appear directly on a CV. Do not incl
             })
             
         except Exception as e:
+            print(f"ERROR in Groq API call: {str(e)}")
+            print(f"Exception type: {type(e).__name__}")
             return jsonify({
                 'success': False,
                 'error': f'Failed to generate AI assistance: {str(e)}'
             }), 500
         
     except Exception as e:
+        print(f"ERROR in ai_assist main handler: {str(e)}")
+        print(f"Exception type: {type(e).__name__}")
         return jsonify({
             'success': False,
             'error': 'Failed to process AI assistance request'
@@ -728,11 +750,17 @@ def download_word(report_id):
         flash('Please complete payment to access your report.', 'warning')
         return redirect(url_for('payment', service='ats_scan'))
     
-    if not report.word_path or not os.path.exists(report.word_path):
-        flash('Word report not found. Please contact support.', 'error')
+    if not report.cv_content:
+        flash('CV content not found. Please contact support.', 'error')
         return redirect(url_for('dashboard'))
     
-    return send_file(report.word_path, as_attachment=True, download_name=f'ats_report_{report.id}.docx')
+    # Generate Word document on-the-fly
+    word_path = generate_cv_word(report)
+    if not word_path or not os.path.exists(word_path):
+        flash('Error generating Word document. Please contact support.', 'error')
+        return redirect(url_for('dashboard'))
+    
+    return send_file(word_path, as_attachment=True, download_name=f'cv_{report.id}.docx')
 
 @app.route('/generate-ats-guaranteed-cv/<int:report_id>')
 @login_required
@@ -1215,22 +1243,30 @@ def generate_cv_content(cv_data):
             return "AI service temporarily unavailable. Please try again later."
             
         prompt = f"""
-Create a professional, ATS-optimized CV based on this information:
+You are a professional CV writer. Create a clean, ATS-optimized CV based on this information:
 
 Personal Information: {cv_data.get('personal_info', {})}
 Work Experience: {cv_data.get('experience', [])}
 Education: {cv_data.get('education', [])}
-Skills: {cv_data.get('skills', [])}
+Skills: {cv_data.get('skills', {})}
 Target Job: {cv_data.get('job_description', '')}
 
-Format as a complete, professional CV with:
-- Professional summary
-- Work experience with quantified achievements
-- Education section
-- Skills section with relevant keywords
-- ATS-friendly formatting
+IMPORTANT FORMATTING RULES:
+- Return ONLY the CV content, no helper text, disclaimers, or suggestions
+- Do NOT include phrases like "I hope this helps", "Good luck", "Remember to customize", etc.
+- Use clean professional formatting with section headers
+- Use bullet points (•) instead of stars (*) or dashes
+- Make section headers bold by using **Header Name**
+- Do NOT use any decorative elements or symbols
+- End the CV content cleanly without any additional commentary
 
-Make it compelling and keyword-rich for the target role.
+Structure the CV with these sections:
+**PROFESSIONAL SUMMARY**
+**WORK EXPERIENCE** 
+**EDUCATION**
+**SKILLS**
+
+Make it compelling, keyword-rich, and ATS-friendly for the target role.
 """
         
         completion = client.chat.completions.create(
@@ -1241,36 +1277,180 @@ Make it compelling and keyword-rich for the target role.
             top_p=1,
         )
         
-        return completion.choices[0].message.content.strip()
+        cv_content = completion.choices[0].message.content.strip()
+        
+        # Clean up unwanted helper text and phrases using the centralized function
+        cv_content = clean_ai_response(cv_content)
+        
+        return cv_content
         
     except Exception as e:
         return f"Error generating CV: {str(e)}"
 
+def clean_ai_response(response):
+    """Clean AI response by removing unwanted helper text and phrases"""
+    if not response:
+        return response
+    
+    # List of unwanted phrases that AI might include
+    unwanted_phrases = [
+        "Here is a", "Here's a", "Here is the", "Here's the",
+        "I hope this helps", "Hope this helps", "This should help",
+        "Good luck", "Best of luck", "Best wishes",
+        "Let me know if", "Feel free to", "Please let me know",
+        "Note:", "Important:", "Remember:",
+        "Here is an improved", "Here's an improved",
+        "Here is your", "Here's your",
+        "ATS-optimized", "ATS-friendly", "optimized for ATS",
+        "professional summary:", "job description:", "skills list:",
+        "certifications:", "languages:", "experience description:",
+        "CV Content:", "CV content:", "cv content:", "Resume Content:",
+        "Resume content:", "resume content:"
+    ]
+    
+    # Remove unwanted phrases (case insensitive)
+    cleaned_response = response
+    for phrase in unwanted_phrases:
+        # Remove phrase at the beginning of sentences
+        import re
+        pattern = r'^\s*' + re.escape(phrase) + r'[:\s]*'
+        cleaned_response = re.sub(pattern, '', cleaned_response, flags=re.IGNORECASE | re.MULTILINE)
+        
+        # Remove phrase anywhere in the text
+        cleaned_response = re.sub(re.escape(phrase), '', cleaned_response, flags=re.IGNORECASE)
+    
+    # Clean up extra whitespace and empty lines
+    cleaned_response = cleaned_response.strip()
+    lines = cleaned_response.split('\n')
+    
+    # Remove empty lines at the beginning and end
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    while lines and not lines[-1].strip():
+        lines.pop()
+    
+    # Remove multiple consecutive empty lines
+    cleaned_lines = []
+    prev_empty = False
+    for line in lines:
+        if line.strip():
+            cleaned_lines.append(line)
+            prev_empty = False
+        elif not prev_empty:
+            cleaned_lines.append(line)
+            prev_empty = True
+    
+    return '\n'.join(cleaned_lines)
+
 def generate_cv_pdf(content, user_id):
-    """Generate professional PDF from CV content"""
+    """Generate professional ATS-friendly PDF from CV content"""
     filename = f"cv_{user_id}_{uuid.uuid4().hex[:8]}.pdf"
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     
-    doc = SimpleDocTemplate(filepath, pagesize=A4)
+    doc = SimpleDocTemplate(
+        filepath, 
+        pagesize=A4,
+        topMargin=0.75*inch,
+        bottomMargin=0.75*inch,
+        leftMargin=0.75*inch,
+        rightMargin=0.75*inch
+    )
+    
     styles = getSampleStyleSheet()
     story = []
     
-    # Custom styles
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=16,
-        spaceAfter=30,
-        textColor='#2C3E50'
+    # Custom ATS-friendly styles
+    header_style = ParagraphStyle(
+        'CVHeader',
+        parent=styles['Heading2'],
+        fontSize=14,
+        spaceAfter=12,
+        spaceBefore=18,
+        textColor=HexColor('#2C3E50'),
+        fontName='Helvetica-Bold',
+        keepWithNext=True
     )
     
-    # Split content into paragraphs and format
-    paragraphs = content.split('\n\n')
-    for para in paragraphs:
-        if para.strip():
-            p = Paragraph(para.strip(), styles['Normal'])
-            story.append(p)
-            story.append(Spacer(1, 12))
+    name_style = ParagraphStyle(
+        'NameStyle',
+        parent=styles['Title'],
+        fontSize=18,
+        spaceAfter=6,
+        textColor=HexColor('#1a1a1a'),
+        fontName='Helvetica-Bold',
+        alignment=TA_CENTER
+    )
+    
+    contact_style = ParagraphStyle(
+        'ContactStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        spaceAfter=20,
+        textColor=HexColor('#555555'),
+        alignment=TA_CENTER
+    )
+    
+    body_style = ParagraphStyle(
+        'BodyStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        spaceAfter=8,
+        textColor=HexColor('#333333'),
+        fontName='Helvetica',
+        leading=14,
+        alignment=TA_JUSTIFY
+    )
+    
+    bullet_style = ParagraphStyle(
+        'BulletStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        spaceAfter=6,
+        textColor=HexColor('#333333'),
+        fontName='Helvetica',
+        leading=14,
+        leftIndent=20,
+        bulletIndent=10
+    )
+    
+    # Process content with intelligent formatting
+    lines = content.split('\n')
+    current_section = None
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Check if line is a section header (bold text between **)
+        if line.startswith('**') and line.endswith('**'):
+            section_title = line.replace('**', '').strip()
+            
+            # Special handling for name (first header-like element)
+            if current_section is None and not any(keyword in section_title.upper() for keyword in ['PROFESSIONAL', 'SUMMARY', 'EXPERIENCE', 'EDUCATION', 'SKILLS']):
+                story.append(Paragraph(section_title, name_style))
+                current_section = 'name'
+            else:
+                story.append(Paragraph(section_title.upper(), header_style))
+                current_section = section_title.lower()
+                
+        # Handle contact information (typically after name)
+        elif current_section == 'name' and ('|' in line or '@' in line or 'phone' in line.lower() or '+' in line):
+            story.append(Paragraph(line, contact_style))
+            
+        # Handle bullet points
+        elif line.startswith('•') or line.startswith('-') or line.startswith('*'):
+            bullet_text = line[1:].strip()
+            story.append(Paragraph(f'• {bullet_text}', bullet_style))
+            
+        # Handle regular paragraphs
+        else:
+            # Convert any remaining ** bold ** formatting to HTML
+            formatted_line = line.replace('**', '<b>', 1).replace('**', '</b>', 1)
+            story.append(Paragraph(formatted_line, body_style))
+    
+    # Add some spacing at the end
+    story.append(Spacer(1, 20))
     
     doc.build(story)
     return filepath
@@ -1361,35 +1541,10 @@ Output a complete, clean, professional CV (maximum 2 pages) with no ATS referenc
         
         cv_content = completion.choices[0].message.content.strip()
         
-        # Clean up any remaining meta-commentary or optimization notes
-        lines_to_remove = [
-            "Note: I've followed the extreme ATS optimization strategies",
-            "ensure a high-scoring CV",
-            "The output is a clean, professional CV",
-            "that a candidate would naturally write",
-            "ATS optimized",
-            "guaranteed score",
-            "optimized CV",
-            "ATS compatibility",
-            "optimization strategies",
-            "formatting requirements",
-            "PROFESSIONAL CV - ATS OPTIMIZED",
-            "This CV has been optimized",
-            "Following ATS best practices"
-        ]
+        # Clean up unwanted helper text and phrases using the centralized function
+        cv_content = clean_ai_response(cv_content)
         
-        # Remove lines containing meta-commentary
-        cleaned_lines = []
-        for line in cv_content.split('\n'):
-            should_keep = True
-            for remove_phrase in lines_to_remove:
-                if remove_phrase.lower() in line.lower():
-                    should_keep = False
-                    break
-            if should_keep:
-                cleaned_lines.append(line)
-        
-        return '\n'.join(cleaned_lines).strip()
+        return cv_content
         
     except Exception as e:
         return f"Error generating ATS-optimized CV: {str(e)}"
@@ -1427,26 +1582,77 @@ def generate_ats_report_pdf(report):
     return filepath
 
 def generate_cv_word(report):
-    """Generate Word document from CV content"""
+    """Generate ATS-friendly Word document from CV content"""
     try:
         from docx import Document
-        from docx.shared import Inches
+        from docx.shared import Inches, Pt
+        from docx.enum.text import WD_ALIGN_PARAGRAPH
+        from docx.oxml.shared import OxmlElement, qn
         
         filename = f"cv_{report.user_id}_{uuid.uuid4().hex[:8]}.docx"
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         
         doc = Document()
         
-        # Add title
-        title = doc.add_heading('Professional CV', 0)
-        title.alignment = 1  # Center alignment
+        # Set document margins for ATS compatibility
+        sections = doc.sections
+        for section in sections:
+            section.top_margin = Inches(0.5)
+            section.bottom_margin = Inches(0.5)
+            section.left_margin = Inches(0.75)
+            section.right_margin = Inches(0.75)
         
-        # Add content
+        # Process CV content
         if report.cv_content:
-            paragraphs = report.cv_content.split('\n\n')
-            for para in paragraphs:
-                if para.strip():
-                    doc.add_paragraph(para.strip())
+            lines = report.cv_content.split('\n')
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                
+                # Check if line is a section header (contains **text**)
+                if line.startswith('**') and line.endswith('**'):
+                    # Remove ** and create bold heading
+                    header_text = line.replace('**', '')
+                    heading = doc.add_heading(header_text, level=2)
+                    heading.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                    
+                    # Style the heading
+                    for run in heading.runs:
+                        run.font.size = Pt(14)
+                        run.font.name = 'Arial'
+                        run.bold = True
+                
+                # Check if line starts with bullet point
+                elif line.startswith('•') or line.startswith('-') or line.startswith('*'):
+                    # Clean up bullet point and add as list item
+                    bullet_text = line[1:].strip()
+                    if bullet_text:
+                        para = doc.add_paragraph(bullet_text, style='List Bullet')
+                        para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                        
+                        # Style the paragraph
+                        for run in para.runs:
+                            run.font.name = 'Arial'
+                            run.font.size = Pt(11)
+                
+                # Regular paragraph
+                else:
+                    # Check if it's a name/contact info (first few lines)
+                    para = doc.add_paragraph(line)
+                    para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                    
+                    # Style the paragraph
+                    for run in para.runs:
+                        run.font.name = 'Arial'
+                        run.font.size = Pt(11)
+                    
+                    # If it looks like a name (first line, all caps or title case)
+                    if (line.isupper() or line.istitle()) and len(line.split()) <= 4:
+                        for run in para.runs:
+                            run.font.size = Pt(16)
+                            run.bold = True
         
         doc.save(filepath)
         return filepath
@@ -1459,13 +1665,17 @@ def generate_cv_word(report):
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write("Professional CV\n\n")
             if report.cv_content:
-                f.write(report.cv_content)
+                # Clean content for text format
+                clean_content = report.cv_content.replace('**', '').replace('•', '-')
+                f.write(clean_content)
         
         return filepath
 
 if __name__ == '__main__':
     with app.app_context():
+        print("Creating database tables...")
         db.create_all()
+        print("Database tables created successfully.")
     
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
