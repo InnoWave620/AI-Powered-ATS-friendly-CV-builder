@@ -270,7 +270,7 @@ def process_cv_build():
     personal_info = data.get('personal_info', {})
     experience = data.get('experience', [])
     education = data.get('education', [])
-    skills = data.get('skills', [])
+    skills = data.get('skills', {})
     job_description = data.get('job_description', '')
     
     try:
@@ -1241,7 +1241,46 @@ def generate_cv_content(cv_data):
         client = get_groq_client()
         if not client:
             return "AI service temporarily unavailable. Please try again later."
+        
+        # Check if work experience exists and has meaningful content
+        experience = cv_data.get('experience', [])
+        has_work_experience = False
+        
+        if experience:
+            for exp in experience:
+                # Check if any experience entry has meaningful content
+                if (exp.get('job_title', '').strip() or 
+                    exp.get('company', '').strip() or 
+                    exp.get('description', '').strip()):
+                    has_work_experience = True
+                    break
+        
+        # Build sections list based on available content
+        sections = ["**PROFESSIONAL SUMMARY**"]
+        
+        if has_work_experience:
+            sections.append("**WORK EXPERIENCE**")
             
+        sections.append("**EDUCATION**")
+        sections.append("**SKILLS**")
+        
+        # Add LANGUAGES section if languages data exists
+        skills_data = cv_data.get('skills', {})
+        if skills_data.get('languages') and any(lang.get('language', '').strip() for lang in skills_data.get('languages', [])):
+            sections.append("**LANGUAGES**")
+            
+        # Add CERTIFICATES section if certifications data exists
+        if skills_data.get('certifications') and any(cert.get('name', '').strip() for cert in skills_data.get('certifications', [])):
+            sections.append("**CERTIFICATES**")
+        
+        sections_text = "\n".join(sections)
+            
+        # Extract user's full name from personal info
+        personal_info = cv_data.get('personal_info', {})
+        first_name = personal_info.get('first_name', '').strip()
+        last_name = personal_info.get('last_name', '').strip()
+        full_name = f"{first_name} {last_name}".strip()
+        
         prompt = f"""
 You are a professional CV writer. Create a clean, ATS-optimized CV based on this information:
 
@@ -1252,19 +1291,21 @@ Skills: {cv_data.get('skills', {})}
 Target Job: {cv_data.get('job_description', '')}
 
 IMPORTANT FORMATTING RULES:
+- Start the CV with the person's full name formatted as: **{full_name}**
+- Do NOT use "CV: " or any title prefix - just start with the bold full name
 - Return ONLY the CV content, no helper text, disclaimers, or suggestions
 - Do NOT include phrases like "I hope this helps", "Good luck", "Remember to customize", etc.
 - Use clean professional formatting with section headers
 - Use bullet points (•) instead of stars (*) or dashes
 - Make section headers bold by using **Header Name**
+- Make important text like job titles, company names, degrees, and institution names bold using **text**
 - Do NOT use any decorative elements or symbols
 - End the CV content cleanly without any additional commentary
+- {'Do NOT include a WORK EXPERIENCE section since no work experience was provided.' if not has_work_experience else 'Include all work experience entries with proper formatting.'}
 
-Structure the CV with these sections:
-**PROFESSIONAL SUMMARY**
-**WORK EXPERIENCE** 
-**EDUCATION**
-**SKILLS**
+Structure the CV with these sections only:
+**{full_name}**
+{sections_text}
 
 Make it compelling, keyword-rich, and ATS-friendly for the target role.
 """
@@ -1305,7 +1346,10 @@ def clean_ai_response(response):
         "professional summary:", "job description:", "skills list:",
         "certifications:", "languages:", "experience description:",
         "CV Content:", "CV content:", "cv content:", "Resume Content:",
-        "Resume content:", "resume content:"
+        "Resume content:", "resume content:", "CV:", "CV :",
+        "clean,", "Clean,", "CLEAN,", "professional,", "Professional,",
+        "optimized,", "Optimized,", "enhanced,", "Enhanced,",
+        "improved,", "Improved,", "updated,", "Updated,"
     ]
     
     # Remove unwanted phrases (case insensitive)
@@ -1321,6 +1365,13 @@ def clean_ai_response(response):
     
     # Clean up extra whitespace and empty lines
     cleaned_response = cleaned_response.strip()
+    
+    # Specifically remove "CV: " from the beginning of the response
+    if cleaned_response.startswith('CV: '):
+        cleaned_response = cleaned_response[4:].strip()
+    elif cleaned_response.startswith('CV:'):
+        cleaned_response = cleaned_response[3:].strip()
+    
     lines = cleaned_response.split('\n')
     
     # Remove empty lines at the beginning and end

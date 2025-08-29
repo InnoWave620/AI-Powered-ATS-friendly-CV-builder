@@ -1328,7 +1328,10 @@
             const textarea = document.querySelector(`[name="${escapedFieldId}"], #${escapedFieldId}`);
             if (textarea) {
                 textarea.value = suggestion;
-                textarea.focus();
+                // Trigger input event to ensure proper form state update
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                // Remove focus call that might trigger unwanted validation
+                // textarea.focus();
             }
             hideSuggestions(fieldId);
         }
